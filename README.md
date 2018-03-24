@@ -1,30 +1,35 @@
-# Adonis fullstack application
+### Run
 
-This is the fullstack boilerplate for AdonisJs, it comes pre-configured with.
-
-1. Bodyparser
-2. Session
-3. Authentication
-4. Web security middleware
-5. CORS
-6. Edge template engine
-7. Lucid ORM
-8. Migrations and seeds
-
-## Setup
-
-Use the adonis command to install the blueprint
-
-```bash
-adonis new yardstick
+Aplikasi uniqa memisahkan aplikasi public dengan admin dengan menggunakan subdomain.
+Saat ini kita menggunakan **```uni.qa```** sebagai based domain.
+Maka perlu ada konfigurasi terlebih dahulu pada komputer masing-masing.  
+Contoh untuk di linux setting domain file ```/etc/hosts```  ;
+```
+127.0.0.1   uni.qa
+127.0.0.1   admin.uni.qa
 ```
 
-or manually clone the repo and then run `npm install`.
+Berikut perintah untuk menjalankan aplikasi.  
+
+```js
+adonis serve --dev --domain=uni.qa@http://127.0.0:1:3333  
+```
+
+Setelah itu Uniqa dapat diakses dengan alamat
+```http://admin.uni.qa:3333/```  
+untuk aplikasi administrator/staff.  
+
+dan  
+
+```http://uni.qa:3333/```
+
+untuk aplikasi publik.
+
 
 
 ### Migrations
 
-Run the following command to run startup migrations.
+Jalankan migrasi dengan perintah berikut
 
 ```js
 adonis migration:run

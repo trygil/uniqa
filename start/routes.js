@@ -15,4 +15,12 @@
 
 const Route = use('Route')
 
-Route.on('/').render('welcome')
+Route.group(() => {
+    Route.on('/').render('welcome')
+}).domain('uni.qa')
+
+Route.group(() => {
+  Route.get('/', 'UserController.getLogin')
+  Route.post('/login', 'UserController.postLogin')
+
+}).domain('admin.uni.qa')
