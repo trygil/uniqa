@@ -1,12 +1,36 @@
-<div class="col-md-8">
-  <form method="post" action="{{ route('login') }}">
-    <div class="form-group">
-      <input type="text" class="form-control" name="username">
-    </div>
-    <div class="form-group">
-      <input type="password" class="form-control" name="password">
-    </div>
-    {{ css('https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css') }}
-    {{ script('https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.min.js') }}
-  </form>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Uniqa Admin</title>
+</head>
+<body>
+  <div id="login">
+    <el-row>
+      <el-col :lg="{span: 10, offset: 7}" :md="{span: 16, offset: 4}">
+        @if(flashMessage('message'))
+          <span> {{ flashMessage('message') }} </span>
+        @endif
+      </el-col>
+    </el-row>
+    <el-row>
+      <el-col :lg="{span: 10, offset: 7}" :md="{span: 16, offset: 4}">
+        <el-form method="post" action="/login">
+          {{ csrfField() }}
+          <el-form-item label="Username">
+            <el-input type="text" name="username"></el-input>
+          </el-form-item>
+          <el-form-item label="Password">
+            <el-input type="password" name="password"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button native-type="submit" type="primary">Login</el-button>
+          </el-form-item>
+        </el-form>
+      </el-col>
+    </el-row>
+  </div>
+  {{ css('assets/admin_application.css') }}
+  {{ script('assets/admin_login.js') }}
+</body>
+</html>
