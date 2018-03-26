@@ -25,6 +25,9 @@ dan
 
 untuk aplikasi publik.
 
+### Run webpack
+
+```./node_modules/.bin/webpack --config ./webpack.config.js```
 
 
 ### Migrations
