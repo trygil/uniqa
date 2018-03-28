@@ -20,7 +20,11 @@ Route.group(() => {
 }).domain('uni.qa')
 
 Route.group(() => {
-  Route.get('/', 'UserController.getLogin')
-  Route.post('/login', 'UserController.postLogin')
+    Route.get('/login', 'UserController.getLogin')
+    Route.post('/login', 'UserController.postLogin')
+}).domain('admin.uni.qa')
 
+Route.group(() => {
+    // SPA route
+    Route.any('*', ({ view }) => view.render('admin.main')).middleware(['admin_auth'])
 }).domain('admin.uni.qa')

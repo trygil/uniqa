@@ -5,10 +5,8 @@ class UserController {
         try {
             await auth.check()
         } catch (error) {
-            return view.render('login')
+            return view.render('admin.login')
         }
-
-        return view.render('welcome')
     }
 
     async postLogin({request, response, auth, session}) {

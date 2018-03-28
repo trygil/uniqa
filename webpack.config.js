@@ -13,6 +13,7 @@ module.exports = {
     ],
     admin_login: [
       "./resources/admin/js/login.js",
+      "./resources/admin/css/login.scss"
     ]
   },
   resolve: {
@@ -77,6 +78,15 @@ module.exports = {
         test: /\.jsx?$/,
         loader: "babel-loader",
         exclude: /node_modules/
+      },
+      {
+        test: /\.css$/,
+        use: [{
+          loader: "css-loader",
+          options: {
+            sourceMap: true
+          }
+        }]
       },
       {
         test: /\.scss$/,
