@@ -6,27 +6,39 @@
         class="grey lighten-4"
         app
         v-model="drawer">
-        <v-list dense class="grey lighten-4">
-            <template v-for="(item, i) in items">
-                <v-layout row v-if="item.heading" align-center :key="i">
-                    <v-flex xs6>
-                        <v-subheader v-if="item.heading">
-                            {{ item.heading }}
-                        </v-subheader>
-                    </v-flex>
-                    <v-flex xs6 class="text-xs-right">
-                        <v-btn small flat>edit</v-btn>
-                    </v-flex>
-                </v-layout>
-                <v-divider dark v-else-if="item.divider" class="my-3" :key="i"></v-divider>
-                <v-list-tile :key="i" v-else @click="">
+        <v-list class="pt-0" flat>
+            <template v-for="item in menu">
+                <v-list-group 
+                    v-if="item.children" 
+                    :key="item.title" 
+                    :prepend-icon="item.icon"
+                    :title="item.title">
+                    <v-list-tile slot="activator">
+                        <v-list-tile-content>
+                            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
+
+                    <v-list-tile 
+                        v-if="item.children"
+                        v-for="subitem in item.children" 
+                        :key="subitem.title" 
+                        :to="subitem.to">
+                        <v-list-tile-action>
+                            <v-icon>{{ subitem.icon }}</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content>
+                            <v-list-tile-title>{{ subitem.title }}</v-list-tile-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
+                </v-list-group>
+
+                <v-list-tile v-if="!item.children" :key="item.title" :to="item.to" :title="item.title">
                     <v-list-tile-action>
                         <v-icon>{{ item.icon }}</v-icon>
                     </v-list-tile-action>
                     <v-list-tile-content>
-                        <v-list-tile-title class="grey--text">
-                            {{ item.text }}
-                        </v-list-tile-title>
+                        <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                     </v-list-tile-content>
                 </v-list-tile>
             </template>
@@ -57,24 +69,43 @@
 <script>
 export default {
     name: "App",
-        data: () => ({
-            drawer: null,
-            items: [
-                { icon: 'lightbulb_outline', text: 'Notes' },
-                { icon: 'touch_app', text: 'Reminders' },
-                { divider: true },
-                { heading: 'Labels' },
-                { icon: 'add', text: 'Create new label' },
-                { divider: true },
-                { icon: 'archive', text: 'Archive' },
-                { icon: 'delete', text: 'Trash' },
-                { divider: true },
-                { icon: 'settings', text: 'Settings' },
-                { icon: 'chat_bubble', text: 'Trash' },
-                { icon: 'help', text: 'Help' },
-                { icon: 'phonelink', text: 'App downloads' },
-                { icon: 'keyboard', text: 'Keyboard shortcuts' }
-            ]
-        }),
+    data: () => ({
+        drawer: null,
+    }),
+    computed: {
+        menu() {
+            let routes = this.$router.options.routes;
+
+            let generateMenu = (path, routes) => {
+                let menu_items = [];
+
+                for (let i in routes) {
+                    let route = routes[i];
+
+                    // routes has menu
+                    if (route.menu) {
+                        let to = "/"+ route.path;
+                        to = to.replace("//", "/");
+
+                        let menu = route.menu;
+
+                        if (route.children)
+                            menu.children = generateMenu(to, route.children);
+
+                        if (!menu.children || menu.children.length < 1) {
+                            menu.children = null;
+                            menu.to = to;
+                        }
+
+                        menu_items.push(menu);
+                    }
+                }
+
+                return menu_items;
+            };
+
+            return generateMenu("/", routes);
+        }
+    },
 }
 </script>

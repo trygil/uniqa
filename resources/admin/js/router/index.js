@@ -17,7 +17,24 @@ let routes = [
         component: require('../components/Invitation/List').default,
         menu: {
             title: "User Invitation",
-            icon: "users"
+            icon: "person_add"
+        },
+    },
+    {
+        path: '/settings',
+        children: [
+            {
+                path: 'administrator',
+                component: require('../components/Invitation/List').default,
+                menu: {
+                    title: "Administrators",
+                    icon: "person_add"
+                },
+            }
+        ],
+        menu: {
+            title: "Settings",
+            icon: "settings"
         },
     },
 ];
