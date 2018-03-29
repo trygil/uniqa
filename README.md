@@ -27,7 +27,7 @@ untuk aplikasi publik.
 
 ### Run webpack
 
-```./node_modules/.bin/webpack --config ./webpack.config.js```
+```./node_modules/.bin/webpack --config ./webpack.config.js --mode development --watch```
 
 
 ### Migrations
