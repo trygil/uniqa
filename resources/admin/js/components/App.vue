@@ -53,6 +53,34 @@
             label="Search"
             prepend-icon="search"></v-text-field>
         <v-spacer></v-spacer>
+        <v-toolbar-items>
+            <v-menu offset-y close-on-click>
+                <v-btn slot="activator" flat>
+                    <v-avatar class="grey mr-2" size="32px">
+                        <!-- <img src="../../images/user.png" alt="avatar"> -->
+                    </v-avatar>
+                    <span class="subheading" 
+                          style="text-transform: none;">
+                        {{ user.username }}
+                    </span>
+                    <v-icon>arrow_drop_down</v-icon>
+                </v-btn>
+                <v-list dense>
+                    <v-divider></v-divider>
+                    <div>
+                        <a href="/logout" class="list__tile list__tile--link" style="position: relative;">
+                            <div class="list__tile__title text-md-center subheading"> logout </div>
+                            <span class="ripple__container">
+                                <span class="ripple__animation ripple__animation--visible" data-activated="1522379837402" style="width: 282px; height: 282px; transform: translate(-50%, -50%) translate(53px, 16px) scale3d(0.99, 0.99, 0.99);"></span>
+                            </span>
+                        </a>
+                    </div>
+                    <!-- <v-list-tile ripple to="/logout" @click.passive="">
+                        <v-list-tile-title class="text-md-center subheading"> logout </v-list-tile-title>
+                    </v-list-tile> -->
+                </v-list>
+            </v-menu>
+        </v-toolbar-items>
     </v-toolbar>
     <v-content>
         <v-container fluid fill-height class="grey lighten-4">
@@ -67,10 +95,13 @@
 </template>
 
 <script>
+import Vue from "vue";
+
 export default {
     name: "App",
     data: () => ({
         drawer: null,
+        user: {},
     }),
     computed: {
         menu() {
@@ -106,6 +137,12 @@ export default {
 
             return generateMenu("/", routes);
         }
+    },
+    mounted() {
+        Vue.http("/user/data")
+            .then((res) => {
+                this.user = res.data
+            })
     },
 }
 </script>

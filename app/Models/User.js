@@ -21,6 +21,9 @@ class User extends Model {
     return 'admin.users'
   }
 
+  static get hidden () {
+    return ['password']
+  }
 
   /**
    * A relationship on tokens is required for auth to

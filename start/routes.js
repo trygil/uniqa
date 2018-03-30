@@ -25,6 +25,9 @@ Route.group(() => {
 }).domain('admin.uni.qa')
 
 Route.group(() => {
+    Route.get('/logout', 'UserController.logout')
+    Route.get('/user/data', 'UserController.data')
+
     // SPA route
-    Route.any('*', ({ view }) => view.render('admin.main')).middleware(['admin_auth'])
+    Route.any('*', ({ view, auth }) => view.render('admin.main', {user: auth.user})).middleware(['admin_auth'])
 }).domain('admin.uni.qa')
