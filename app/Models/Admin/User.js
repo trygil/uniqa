@@ -18,7 +18,7 @@ class User extends Model {
 
   // override table name
   static get table () {
-    return 'users'
+    return 'admin.users'
   }
 
   static get hidden () {
@@ -36,7 +36,7 @@ class User extends Model {
    * @return {Object}
    */
   tokens () {
-    return this.hasMany('App/Models/Token')
+    return this.hasMany('App/Models/Admin/Token')
   }
 }
 

@@ -20,14 +20,13 @@ Route.group(() => {
 }).domain('uni.qa')
 
 Route.group(() => {
-    Route.get('/login', 'UserController.getLogin')
-    Route.post('/login', 'UserController.postLogin')
-}).domain('admin.uni.qa')
+    Route.get('/login', 'AdminController.getLogin')
+    Route.post('/login', 'AdminController.postLogin')
 
-Route.group(() => {
-    Route.get('/logout', 'UserController.logout')
-    Route.get('/user/data', 'UserController.data')
+    Route.get('/logout', 'AdminController.logout').middleware(['admin_auth'])
+    Route.get('/user/data', 'AdminController.data').middleware(['admin_auth'])
+    Route.get('/person/data', 'PersonController.data').middleware(['admin_auth'])
 
     // SPA route
-    Route.any('*', ({ view, auth }) => view.render('admin.main', {user: auth.user})).middleware(['admin_auth'])
+    Route.any('*', ({ view, auth }) => view.render('admin.main', {user: auth.authenticator('admin').user})).middleware(['admin_auth'])
 }).domain('admin.uni.qa')

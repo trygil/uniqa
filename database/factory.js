@@ -14,10 +14,18 @@
 const Factory = use('Factory')
 const Hash = use('Hash')
 
-Factory.blueprint('App/Models/User', async (faker) => {
+Factory.blueprint('App/Models/Admin/User', async (faker) => {
     return {
         username: faker.username(),
-        password: "admin",// no need to hash because we're using hash hook in the 'App/Models/User'
+        password: "admin",// no need to hash because we're using hash hook in the 'App/Models/Admin/User'
+        email: faker.email(),
+    };
+});
+
+Factory.blueprint('App/Models/Admin/Person', async (faker) => {
+    return {
+        first_name: faker.first(),
+        last_name: faker.last(),
         email: faker.email(),
     };
 });

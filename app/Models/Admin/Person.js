@@ -2,11 +2,11 @@
 
 const Model = use('Model')
 
-class Token extends Model {
+class Person extends Model {
   // override table name
   static get table () {
-    return 'tokens'
+    return 'admin.persons'
   }
 }
 
-module.exports = Token
+module.exports = Person

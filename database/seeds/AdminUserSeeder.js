@@ -15,7 +15,7 @@ const Factory = use('Factory')
 class AdminUserSeeder {
   async run () {
     const usersArray = await Factory
-      .model('App/Models/User')
+      .model('App/Models/Admin/User')
       .createMany(5)
   }
 
