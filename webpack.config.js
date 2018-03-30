@@ -9,10 +9,14 @@ module.exports = {
   entry: {
     admin_application: [
       "./resources/admin/js/application.js",
+    ],
+    admin_application_style: [
       "./resources/admin/css/application.scss"
     ],
     admin_login: [
       "./resources/admin/js/login.js",
+    ],
+    admin_login_style: [
       "./resources/admin/css/login.scss"
     ]
   },

@@ -1,7 +1,9 @@
 {
   "admin_application.js": "admin_application.js",
-  "admin_application.css": "admin_application.css",
+  "admin_application_style.js": "admin_application_style.js",
+  "admin_application_style.css": "admin_application_style.css",
   "admin_login.js": "admin_login.js",
-  "admin_login.css": "admin_login.css",
+  "admin_login_style.js": "admin_login_style.js",
+  "admin_login_style.css": "admin_login_style.css",
   "element-icons.ttf": "6f0a76321d30f3c8120915e57f7bd77e.ttf"
 }
