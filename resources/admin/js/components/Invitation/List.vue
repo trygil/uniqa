@@ -1,31 +1,30 @@
 <template>
     <div>
-         <v-data-table
-              :headers="headers"
-              :items="items"
-              :search="search"
-              :pagination.sync="pagination"
-              :total-items="totalItems"
-              :loading="loading"
-              class="elevation-1"
-            >
-              <template slot="items" slot-scope="{item}">
+        <v-data-table
+            :headers="headers"
+            :items="items"
+            :search="search"
+            :pagination.sync="pagination"
+            :total-items="totalItems"
+            :loading="loading"
+            class="elevation-1"
+        >
+            <template slot="items" slot-scope="{item}">
                 <td>{{ item.first_name }} {{ item.last_name }}</td>
                 <td>{{ item.email }}</td>
                 <td>
                     <v-btn icon small>
                         <v-icon>edit</v-icon>
                     </v-btn>
-                     <v-tooltip bottom>
-                        <v-btn small icon slot="activator">
+                    <v-tooltip bottom>
+                        <v-btn small icon slot="activator" @click="invite(item)">
                             <v-icon color="success">contact_mail</v-icon>
                         </v-btn>
                         <span>Invite!</span>
                     </v-tooltip>
-                    
                 </td>
-              </template>
-            </v-data-table>
+            </template>
+        </v-data-table>
     </div>
 </template>
 
@@ -70,6 +69,19 @@ export default {
                     this.totalItems = parseInt(response.total);
                 })
         },
+
+        invite(person) {
+            Vue.http
+                .post("/invitation/invite", {id: person.id})
+                .then(
+                    () => {
+                        alert("Invitation has been sent successfully.");
+                    },
+                    () => {
+                        alert("Failed to send invitation.");
+                    }
+                )
+        }
     },
 };
 </script>

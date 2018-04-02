@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <style type="text/css">
+            * {
+                font-family: sans-serif;
+            }
+            .title, .body {
+                display: inline-block;
+                width: 100%;
+            }
+            .title {
+                margin: 10px 0px;
+                padding: 10px 0px;
+                /*border-bottom: solid 1px #ccc;*/
+                text-align: center;
+            }
+            .body {
+                padding: 10px 0px;
+            }
+            .btn-accept {
+                padding: 20px 40px;
+                border-radius: 3px;
+                background: #09f;
+                color: #fff;
+                text-decoration: none;
+                font-size: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <center>
+            <div class="title">
+                <h1>UNIQA Invitation Link</h1>
+            </div>
+
+            <div class="body">
+                <a class="btn-accept" href="{{ link }}"> Accept </a>
+            </div>
+        </center>
+    </body>
+</html>

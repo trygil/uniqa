@@ -3,7 +3,7 @@
 class AdminController {
     async getLogin({request, view, auth, response}) {
         try {
-            let logged_in = await auth.authenticator('admin').check()
+            let logged_in = await auth.authenticator('admin').check();
         } catch (error) {
             return view.render('admin.login')
         }

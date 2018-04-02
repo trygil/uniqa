@@ -17,6 +17,8 @@ const Route = use('Route')
 
 Route.group(() => {
     Route.on('/').render('welcome')
+
+    Route.get('/accept/:token', 'PersonController.acceptInvitation')
 }).domain('uni.qa')
 
 Route.group(() => {
@@ -27,6 +29,12 @@ Route.group(() => {
     Route.get('/user/data', 'AdminController.data').middleware(['admin_auth'])
     Route.get('/person/data', 'PersonController.data').middleware(['admin_auth'])
 
+    Route.post('/invitation/invite', 'PersonController.invite')
+
     // SPA route
-    Route.any('*', ({ view, auth }) => view.render('admin.main', {user: auth.authenticator('admin').user})).middleware(['admin_auth'])
+    Route.any('*', ({ view, auth }) => view
+        .render('admin.main', {
+            user: auth.authenticator('admin').user
+        })
+    ).middleware(['admin_auth'])
 }).domain('admin.uni.qa')
