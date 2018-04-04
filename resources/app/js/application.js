@@ -7,7 +7,8 @@ import {
     Input,
     FormItem,
     Button,
-    Message
+    Message,
+    Alert
 } from 'element-ui'
 import axios from 'axios'
 import el_locale from 'element-ui/lib/locale/lang/en'
@@ -23,6 +24,7 @@ Vue.use(Form)
 Vue.use(Input)
 Vue.use(FormItem)
 Vue.use(Button)
+Vue.use(Alert)
 Vue.prototype.$message = Message;
 
 Vue.prototype.$ELEMENT = {locale: el_locale};

@@ -11,14 +11,20 @@ module.exports = {
       "./resources/admin/js/application.js",
     ],
     admin_application_style: [
-      "./resources/admin/css/application.scss"
+      "./resources/admin/css/application.scss",
     ],
     admin_login: [
       "./resources/admin/js/login.js",
     ],
     admin_login_style: [
       "./resources/admin/css/login.scss"
-    ]
+    ],
+    app_application: [
+      "./resources/app/js/application.js",
+    ],
+    app_application_style: [
+      "./resources/app/css/application.scss",
+    ],
   },
   resolve: {
     alias: {

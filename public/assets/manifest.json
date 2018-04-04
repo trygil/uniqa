@@ -5,5 +5,8 @@
   "admin_login.js": "admin_login.js",
   "admin_login_style.js": "admin_login_style.js",
   "admin_login_style.css": "admin_login_style.css",
+  "app_application.js": "app_application.js",
+  "app_application_style.js": "app_application_style.js",
+  "app_application_style.css": "app_application_style.css",
   "element-icons.ttf": "6f0a76321d30f3c8120915e57f7bd77e.ttf"
 }

@@ -8,7 +8,32 @@ const Mail = use('Mail')
 
 class PersonController {
     async data({request}) {
-        let persons = await Person.query().paginate(1, 5)
+        const params = request.all();
+        let query = Database.table('admin.persons as p');
+        query.leftJoin(
+            Database.raw('(SELECT person_id FROM admin.invitations GROUP BY person_id) as i'), 
+            'i.person_id', '=', 'p.id'
+        );
+
+        let sortby = ['p.' + params.sortby];
+        if (params.sortby == 'full_name')
+            sortby = ['p.first_name', 'p.last_name'];
+
+        if (params.sortby)
+            for (let i in sortby)
+                query.orderBy(sortby[i], JSON.parse(params.asc) ? 'asc' : 'desc');
+
+        query.select([
+            'p.id', 
+            'p.first_name', 
+            'p.last_name', 
+            'p.email', 
+            'p.data', 
+            Database.raw('i.person_id IS NOT NULL as invited')
+        ]);
+
+
+        let persons = await query.paginate(params.page, params.perpage);
 
         return persons
     }
@@ -20,6 +45,9 @@ class PersonController {
         const reqParam = request.all()
         const trx = await Database.beginTransaction()
         const person = await Person.find(reqParam.id)
+
+        // delete old invitation(s)
+        await Invitation.query().where('person_id', reqParam.id).delete(trx)
 
         // make invitation
         const invitation = new Invitation()
@@ -77,6 +105,8 @@ class PersonController {
                     .subject('Password Information')
             })
 
+            person.status = 1;
+            await person.save(trx)
             await user.save(trx)
 
             trx.commit()
@@ -86,10 +116,26 @@ class PersonController {
         }
         catch (e) {
             // invalid token
-            console.log(e)
+            console.error(e)
+            session.flash({ error: ['Gagal mendaftarkan akun, link undangan mungkin telah kadaluarsa'] })
         }
 
         return response.redirect('/')
+    }
+
+    async cancel({request}) {
+        const Encryption = use('Encryption')
+        const Env = use('Env')
+
+        const reqParam = request.all()
+        const trx = await Database.beginTransaction()
+
+        // delete old invitation(s)
+        await Invitation.query().where('person_id', reqParam.id).delete(trx)
+
+        trx.commit()
+
+        return 'Invitation canceled'
     }
 }
 

@@ -4,9 +4,19 @@
             * {
                 font-family: sans-serif;
             }
+
+            .main {
+                border: 1px solid #09f;
+                border-radius: 3px;
+                overflow: hidden;
+                padding: 5px;
+                text-align: center;
+            }
+
             .title, .body {
                 display: inline-block;
                 width: 100%;
+                color: #4c5567;
             }
             .title {
                 margin: 10px 0px;
@@ -16,26 +26,31 @@
             }
             .body {
                 padding: 10px 0px;
+                overflow: hidden;
             }
             .btn-accept {
                 padding: 20px 40px;
                 border-radius: 3px;
                 background: #09f;
                 color: #fff;
+                display: inline-block;
                 text-decoration: none;
                 font-size: 20px;
             }
         </style>
     </head>
     <body>
-        <center>
+        <div class="main">
             <div class="title">
                 <h1>UNIQA Invitation Link</h1>
             </div>
 
             <div class="body">
+                Halo {{ person.first_name }} {{ person.last_name }}, anda mendapat undangan untuk menjadi user Uniqa!
+            </div>
+            <div class="body">
                 <a class="btn-accept" href="{{ link }}"> Accept </a>
             </div>
-        </center>
+        </div>
     </body>
 </html>

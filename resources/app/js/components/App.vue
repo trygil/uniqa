@@ -1,6 +1,6 @@
 <template>
 <v-app id="inspire">
-    <v-navigation-drawer
+    <!-- <v-navigation-drawer
         clipped
         class="grey lighten-4"
         app
@@ -42,13 +42,37 @@
                 </v-list-tile>
             </template>
         </v-list>
-    </v-navigation-drawer>
-    <v-toolbar color="blue-grey" dark app absolute clipped-left>
-        <v-toolbar-side-icon @click.native="drawer = !drawer"></v-toolbar-side-icon>
-        <span class="title ml-3 mr-5"><span class="text">Uniqa!</span></span>
-        <v-spacer></v-spacer>
+    </v-navigation-drawer> -->
+    <v-toolbar color="blue-grey lighten-5" app absolute clipped-left>
+        <!-- <v-toolbar-side-icon @click.native="drawer = !drawer"></v-toolbar-side-icon> -->
+        <span class="title ml-3 mr-5">
+             <v-avatar tile :size="50">
+                  <img src="/uniqamente.png" alt="avatar">
+                </v-avatar>
+            <span class="text">Uniqa!</span>
+        </span>
+
         <v-toolbar-items>
-            <v-menu offset-y close-on-click>
+            <v-btn to="/ask" flat>
+                <v-icon>language</v-icon> Explore!
+            </v-btn>
+
+            <v-btn to="/ask" flat>
+                <v-icon>question_answer</v-icon> Ask Question
+            </v-btn>
+            
+        </v-toolbar-items>
+        <v-spacer></v-spacer>
+        <v-text-field
+            solo-inverted
+            flat
+            label="Search"
+            prepend-icon="search"></v-text-field>
+        <v-toolbar-items>
+            <v-btn flat offset-y v-show="!user.username">
+                Login
+            </v-btn>
+            <v-menu offset-y close-on-click v-show="user.username">
                 <v-btn slot="activator" flat>
                     <v-avatar class="grey mr-2" size="32px">
                         <!-- <img src="../../images/user.png" alt="avatar"> -->
@@ -69,9 +93,6 @@
                             </span>
                         </a>
                     </div>
-                    <!-- <v-list-tile ripple to="/logout" @click.passive="">
-                        <v-list-tile-title class="text-md-center subheading"> logout </v-list-tile-title>
-                    </v-list-tile> -->
                 </v-list>
             </v-menu>
         </v-toolbar-items>
@@ -97,46 +118,11 @@ export default {
         drawer: null,
         user: {},
     }),
-    computed: {
-        menu() {
-            let routes = this.$router.options.routes;
-
-            let generateMenu = (path, routes) => {
-                let menu_items = [];
-
-                for (let i in routes) {
-                    let route = routes[i];
-
-                    // routes has menu
-                    if (route.menu) {
-                        let to = "/"+ route.path;
-                        to = to.replace("//", "/");
-
-                        let menu = route.menu;
-
-                        if (route.children)
-                            menu.children = generateMenu(to, route.children);
-
-                        if (!menu.children || menu.children.length < 1) {
-                            menu.children = null;
-                            menu.to = to;
-                        }
-
-                        menu_items.push(menu);
-                    }
-                }
-
-                return menu_items;
-            };
-
-            return generateMenu("/", routes);
-        }
-    },
     mounted() {
         Vue.http("/user/data")
             .then((res) => {
                 this.user = res.data
-            })
+            });
     },
 }
 </script>

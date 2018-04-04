@@ -2,14 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Hello Adonis</title>
-    {{ css('assets/admin_application_style.css') }}
+    <title>Uniqa</title>
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+    {{ css('assets/app_application_style.css') }}
 </head>
 <body>
-    <section>
+    <section id="app">
         @if(flashMessage('success'))
             @each(msg in flashMessage('success'))
+                {{ msg }}
                 <el-alert title="success alert" type="success">{{ msg }}</el-alert>
+            @endeach
+        @endif
+
+        @if(flashMessage('error'))
+            @each(msg in flashMessage('error'))
+                {{ msg }}
+                <el-alert title="error alert" type="error">{{ msg }}</el-alert>
             @endeach
         @endif
 
@@ -20,6 +29,6 @@
         </div>
     </section>
 
-    {{ script('assets/admin_application.js') }}
+    {{ script('assets/app_application.js') }}
 </body>
 </html>

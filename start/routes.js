@@ -14,9 +14,10 @@
 */
 
 const Route = use('Route')
+const Person = use('App/Models/Admin/Person')
 
 Route.group(() => {
-    Route.on('/').render('welcome')
+    Route.on('/').render('uniqamente')
 
     Route.get('/accept/:token', 'PersonController.acceptInvitation')
 }).domain('uni.qa')
@@ -28,8 +29,8 @@ Route.group(() => {
     Route.get('/logout', 'AdminController.logout').middleware(['admin_auth'])
     Route.get('/user/data', 'AdminController.data').middleware(['admin_auth'])
     Route.get('/person/data', 'PersonController.data').middleware(['admin_auth'])
-
-    Route.post('/invitation/invite', 'PersonController.invite')
+    Route.post('/invitation/invite', 'PersonController.invite').middleware(['admin_auth'])
+    Route.post('/invitation/cancel', 'PersonController.cancel').middleware(['admin_auth'])
 
     // SPA route
     Route.any('*', ({ view, auth }) => view
