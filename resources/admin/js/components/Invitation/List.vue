@@ -54,6 +54,7 @@
                     </v-edit-dialog>
                 </td>
                 <td>
+                    <!-- user not invited -->
                     <v-tooltip bottom v-show="!item.invited">
                         <v-btn 
                             small 
@@ -64,11 +65,27 @@
                             :disabled="item.inviting">
                             <v-icon color="success">contact_mail</v-icon>
                         </v-btn>
-                        <span>Invite!</span>
+                        <span>Undang!</span>
                     </v-tooltip>
+
+                    <v-tooltip bottom v-show="!item.invited">
+                        <v-btn 
+                            small 
+                            icon 
+                            slot="activator" 
+                            @click="deletePerson(item)" 
+                            :loading="item.deleting"
+                            :disabled="item.deleting">
+                            <v-icon color="error">delete</v-icon>
+                        </v-btn>
+                        <span>Hapus</span>
+                    </v-tooltip>
+                    <!-- user not invited -->
+
+                    <!-- user invited -->
                     <v-tooltip bottom v-show="item.invited">
                         <v-icon slot="activator">done</v-icon>
-                        <span>Invite Sent!</span>
+                        <span>Undangan terkirim.</span>
                     </v-tooltip>
 
                     <v-tooltip bottom v-show="item.invited">
@@ -81,8 +98,9 @@
                             :disabled="item.canceling">
                             <v-icon color="error">close</v-icon>
                         </v-btn>
-                        <span>Cancel invitation</span>
+                        <span>Batalkan undangan</span>
                     </v-tooltip>
+                    <!-- user invited -->
                 </td>
             </template>
             <v-alert slot="no-results" :value="true" color="error" icon="warning">
@@ -247,7 +265,6 @@ export default {
                         this.closeDialog();
                     }
                 );
-
         },
 
         edit(person) {
@@ -266,6 +283,33 @@ export default {
                         this.$set(person, "editing", false);
                     }
                 )
+        },
+
+        deletePerson(person) {
+            const vm = this;
+
+            this.$confirm('Data akan terhapus secara permanen. Yakin?', 'Warning', {
+                confirmButtonText: 'Yakin',
+                cancelButtonText: 'Batal',
+                type: 'warning'
+            }).then(() => {
+                this.$set(person, "deleting", true);
+                Vue.http
+                    .get("/person/delete", {params: {id: person.id}})
+                    .then(
+                        () => {
+                            vm.$message.success("Data telah terhapus.");
+                            this.$set(person, "deleting", false);
+                            this.loadData();
+                        },
+                        () => {
+                            vm.$message.error("Terjadi kesalahan ketika menghapus data.");
+                            this.$set(person, "deleting", false);
+                        }
+                    )
+            }).catch(() => {
+                this.$message.info("Hapus dibatalkan");
+            });
         },
     },
     watch:{

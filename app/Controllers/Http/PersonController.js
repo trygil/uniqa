@@ -158,7 +158,7 @@ class PersonController {
 
         trx.commit()
 
-        return 'Data edited';
+        return 'Data saved';
     }
 
     async edit({request, response}) {
@@ -179,6 +179,22 @@ class PersonController {
         trx.commit()
 
         return 'Data edited';
+    }
+
+     async delete({request, response}) {
+        const id = request.all().id;
+        const trx = await Database.beginTransaction()
+
+        let person = await Person.find(id)
+
+        if (!person)
+            return response.status(404).send('Not found!')
+
+        await person.delete(trx);
+
+        trx.commit()
+
+        return 'Data deleted';
     }
 }
 
