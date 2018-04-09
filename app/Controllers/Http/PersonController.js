@@ -32,6 +32,12 @@ class PersonController {
             Database.raw('i.person_id IS NOT NULL as invited')
         ]);
 
+        if (params.search)
+            query.whereRaw(`
+                p.first_name || p.last_name ILIKE ? OR
+                p.email ILIKE ?`, [params.search + '%', params.search + '%']
+            );
+
 
         let persons = await query.paginate(params.page, params.perpage);
 
@@ -136,6 +142,23 @@ class PersonController {
         trx.commit()
 
         return 'Invitation canceled'
+    }
+
+    async add({request, response}) {
+        const params = request.all().person;
+        const trx = await Database.beginTransaction()
+
+        let person = new Person();
+
+        person.first_name = params.first_name;
+        person.last_name = params.last_name;
+        person.email = params.email;
+
+        await person.save(trx);
+
+        trx.commit()
+
+        return 'Data edited';
     }
 
     async edit({request, response}) {

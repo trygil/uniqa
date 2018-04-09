@@ -1,5 +1,19 @@
 <template>
-    <div>
+    <v-card>
+        <v-card-title>
+            <h2>Daftar Orang</h2>
+            <v-btn color="primary" outline @click="addPerson">
+                <v-icon>person_add</v-icon>
+                {{ $t('action.add') }}
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-text-field
+                append-icon="search"
+                label="Cari.."
+                single-line
+                hide-details
+                v-model="search"></v-text-field>
+        </v-card-title>
         <v-data-table
             :headers="headers"
             :items="items"
@@ -7,8 +21,7 @@
             :pagination.sync="pagination"
             :total-items="totalItems"
             :loading="loading"
-            class="elevation-1"
-        >
+            class="elevation-5">
             <template slot="items" slot-scope="{item}">
                 <td>
                     <span v-show="item.invited">{{ item.first_name }} {{ item.last_name }}</span>
@@ -72,21 +85,55 @@
                     </v-tooltip>
                 </td>
             </template>
+            <v-alert slot="no-results" :value="true" color="error" icon="warning">
+                "{{ search }}" tidak ditemukan.
+            </v-alert>
         </v-data-table>
-    </div>
+
+        <v-dialog v-model="dialog" max-width="800px">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">{{ form.id ? 'Edit' : 'Tambah' }}</span>
+                </v-card-title>
+                <v-card-text>
+                    <v-container grid-list-md>
+                        <v-layout wrap>
+                            <v-flex md6>
+                                <v-text-field label="Nama Awal" v-model="form.first_name"></v-text-field>
+                            </v-flex>
+                            <v-flex md6>
+                                <v-text-field label="Nama Akhir" v-model="form.last_name"></v-text-field>
+                            </v-flex>
+                            <v-flex md12>
+                                <v-text-field label="Email" v-model="form.email"></v-text-field>
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn outline @click="closeDialog">Cancel</v-btn>
+                    <v-btn color="blue darken-1" outline @click="save">Save</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+    </v-card>
 </template>
 
 <script>
 import Vue from "vue";
+
+let search_timer = null;
 
 export default {
     name: "InvitationList",
     data() {
         return {
             headers: [
-                { text: 'Name', value: 'full_name' },
-                { text: 'Email', value: "email" },
-                { text: '#', value: null, sortable: false },
+                { text: 'Nama', value: 'full_name', width: "30%" },
+                { text: 'Email', value: "email", width: "20%" },
+                { text: '#', value: null, sortable: false, width: "10%" },
             ],
             items: [],
             search: "",
@@ -94,6 +141,8 @@ export default {
             totalItems: 0,
             items: [],
             loading: true,
+            dialog: false,
+            form: {},
         }
     },
     watch: {
@@ -116,6 +165,9 @@ export default {
                 perpage: this.pagination.rowsPerPage,
                 sortby: this.pagination.sortBy,
             };
+
+            if (this.search)
+                params.search = this.search;
 
             return Vue.http("/person/data", {params})
                 .then((res) => {
@@ -169,6 +221,35 @@ export default {
                 )
         },
 
+        addPerson() {
+            this.dialog = true;
+        },
+
+        closeDialog() {
+            this.form = {};
+            this.dialog = false;
+        },
+
+        save() {
+            const vm = this;
+
+            Vue.http
+                .post("/person/add", {person: this.form})
+                .then(
+                    () => {
+                        vm.$message.success("Data berhasil tersimpan.");
+                        this.closeDialog();
+                        this.search = "";
+                        this.loadData();
+                    },
+                    () => {
+                        vm.$message.error("Terjadi kesalahan ketika menyimpan data.");
+                        this.closeDialog();
+                    }
+                );
+
+        },
+
         edit(person) {
             const vm = this;
             this.$set(person, "editing", true);
@@ -177,13 +258,25 @@ export default {
                 .post("/person/edit", {person: person})
                 .then(
                     () => {
-                        vm.$message.success("Data successfully edited.");
+                        vm.$message.success("Data berhasil tersimpan.");
+                        this.$set(person, "editing", false);
                     },
                     () => {
-                        vm.$message.error("Failed to edit person data.");
+                        vm.$message.error("Terjadi kesalahan ketika akan menyimpan data.");
                         this.$set(person, "editing", false);
                     }
                 )
+        },
+    },
+    watch:{
+        search() {
+            let vm = this;
+            if (search_timer)
+                clearTimeout(search_timer);
+
+            search_timer = setTimeout(() => {
+                vm.loadData();
+            }, 500);
         },
     },
 };
