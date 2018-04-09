@@ -10,12 +10,37 @@
             class="elevation-1"
         >
             <template slot="items" slot-scope="{item}">
-                <td>{{ item.first_name }} {{ item.last_name }}</td>
-                <td>{{ item.email }}</td>
                 <td>
-                    <!-- <v-btn icon small>
-                        <v-icon>edit</v-icon>
-                    </v-btn> -->
+                    <span v-show="item.invited">{{ item.first_name }} {{ item.last_name }}</span>
+                    <v-edit-dialog v-show="!item.invited" :return-value.sync="item.first_name">
+                        {{ item.first_name }} {{ item.last_name }}
+                        <v-text-field
+                            slot="input"
+                            label="First Name"
+                            v-model="item.first_name"
+                            single-line
+                            @keyup.enter="edit(item)"></v-text-field>
+                        <v-text-field
+                            slot="input"
+                            label="Last Name"
+                            v-model="item.last_name"
+                            single-line
+                            @keyup.enter="edit(item)"></v-text-field>
+                    </v-edit-dialog>
+                </td>
+                <td>
+                    <span v-show="item.invited">{{ item.email }}</span>
+                    <v-edit-dialog v-show="!item.invited" :return-value.sync="item.email">
+                        {{ item.email }}
+                        <v-text-field
+                            slot="input"
+                            label="Email"
+                            v-model="item.email"
+                            single-line
+                            @keyup.enter="edit(item)"></v-text-field>
+                    </v-edit-dialog>
+                </td>
+                <td>
                     <v-tooltip bottom v-show="!item.invited">
                         <v-btn 
                             small 
@@ -142,7 +167,24 @@ export default {
                         this.$set(person, "canceling", false);
                     }
                 )
-        }
+        },
+
+        edit(person) {
+            const vm = this;
+            this.$set(person, "editing", true);
+
+            Vue.http
+                .post("/person/edit", {person: person})
+                .then(
+                    () => {
+                        vm.$message.success("Data successfully edited.");
+                    },
+                    () => {
+                        vm.$message.error("Failed to edit person data.");
+                        this.$set(person, "editing", false);
+                    }
+                )
+        },
     },
 };
 </script>

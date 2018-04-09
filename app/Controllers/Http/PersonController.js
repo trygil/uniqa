@@ -137,6 +137,26 @@ class PersonController {
 
         return 'Invitation canceled'
     }
+
+    async edit({request, response}) {
+        const params = request.all().person;
+        const trx = await Database.beginTransaction()
+
+        let person = await Person.find(params.id)
+
+        if (!person)
+            return response.status(404).send('Not found!')
+
+        person.first_name = params.first_name;
+        person.last_name = params.last_name;
+        person.email = params.email;
+
+        await person.save(trx);
+
+        trx.commit()
+
+        return 'Data edited';
+    }
 }
 
 module.exports = PersonController
