@@ -10,8 +10,9 @@ class PersonController {
     async data({request}) {
         const params = request.all();
         let query = Database.table('admin.persons as p');
+
         query.leftJoin(
-            Database.raw('(SELECT person_id FROM admin.invitations GROUP BY person_id) as i'), 
+            Database.raw('(SELECT person_id FROM admin.invitations GROUP BY person_id) as i'),
             'i.person_id', '=', 'p.id'
         );
 
@@ -24,11 +25,11 @@ class PersonController {
                 query.orderBy(sortby[i], JSON.parse(params.asc) ? 'asc' : 'desc');
 
         query.select([
-            'p.id', 
-            'p.first_name', 
-            'p.last_name', 
-            'p.email', 
-            'p.data', 
+            'p.id',
+            'p.first_name',
+            'p.last_name',
+            'p.email',
+            'p.data',
             Database.raw('i.person_id IS NOT NULL as invited')
         ]);
 
@@ -116,7 +117,6 @@ class PersonController {
         }
         catch (e) {
             // invalid token
-            console.error(e)
             session.flash({ error: ['Gagal mendaftarkan akun, link undangan mungkin telah kadaluarsa'] })
         }
 

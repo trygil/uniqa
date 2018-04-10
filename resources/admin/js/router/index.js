@@ -22,15 +22,24 @@ let routes = [
     },
     {
         path: '/settings',
+        component: require('../components/Settings/Layout').default,
         children: [
             {
-                path: 'administrator',
-                component: require('../components/Invitation/List').default,
+                path: 'profile',
+                component: require('../components/Settings/Profile').default,
                 menu: {
-                    title: "Administrators",
-                    icon: "person_add"
+                    title: "Profile",
+                    icon: "person"
                 },
-            }
+            },
+            {
+                path: 'change-password',
+                component: require('../components/Settings/ChangePassword').default,
+                menu: {
+                    title: "Change password",
+                    icon: "lock"
+                },
+            },
         ],
         menu: {
             title: "Settings",

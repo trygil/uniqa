@@ -7,9 +7,9 @@
         v-model="drawer">
         <v-list class="pt-0" flat>
             <template v-for="item in menu">
-                <v-list-group 
-                    v-if="item.children" 
-                    :key="item.title" 
+                <v-list-group
+                    v-if="item.children"
+                    :key="item.title"
                     :prepend-icon="item.icon"
                     :title="item.title">
                     <v-list-tile slot="activator">
@@ -18,10 +18,10 @@
                         </v-list-tile-content>
                     </v-list-tile>
 
-                    <v-list-tile 
+                    <v-list-tile
                         v-if="item.children"
-                        v-for="subitem in item.children" 
-                        :key="subitem.title" 
+                        v-for="subitem in item.children"
+                        :key="subitem.title"
                         :to="subitem.to">
                         <v-list-tile-action>
                             <v-icon>{{ subitem.icon }}</v-icon>
@@ -53,7 +53,7 @@
                     <v-avatar class="grey mr-2" size="32px">
                         <!-- <img src="../../images/user.png" alt="avatar"> -->
                     </v-avatar>
-                    <span class="subheading" 
+                    <span class="subheading"
                           style="text-transform: none;">
                         {{ user.username }}
                     </span>
@@ -109,7 +109,7 @@ export default {
 
                     // routes has menu
                     if (route.menu) {
-                        let to = "/"+ route.path;
+                        let to = /^\//.test(route.path) ? route.path : "/"+ path +"/"+ route.path;
                         to = to.replace("//", "/");
 
                         let menu = route.menu;

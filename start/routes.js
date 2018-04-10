@@ -32,10 +32,14 @@ Route.group(() => {
     Route.post('/invitation/invite', 'PersonController.invite').middleware(['admin_auth'])
     Route.post('/invitation/cancel', 'PersonController.cancel').middleware(['admin_auth'])
 
+    Route.get('/admin/profile', 'AdminController.getProfile').middleware(['admin_auth'])
+    Route.post('/admin/profile', 'AdminController.updateProfile').middleware(['admin_auth'])
+    Route.post('/admin/change-password', 'AdminController.changePassword').middleware(['admin_auth'])
+
     // SPA route
     Route.any('*', ({ view, auth }) => view
         .render('admin.main', {
-            user: auth.authenticator('admin').user
+            user: auth.authenticator('admin').user,
         })
     ).middleware(['admin_auth'])
 }).domain('admin.uni.qa')
