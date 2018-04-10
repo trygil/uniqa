@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>Account</h1>
+        <h2 class="grey--text">Account</h2>
 
         <v-form v-model="valid" ref="form" lazy-validation>
             <v-text-field
@@ -39,12 +39,7 @@
               counter
             ></v-text-field>
 
-            <v-btn
-                @click="submit"
-                :disabled="!valid"
-            >
-                submit
-            </v-btn>
+            <v-btn @click="submit" :disabled="!valid"> submit </v-btn>
         </v-form>
     </div>
 </template>
@@ -96,6 +91,6 @@
                         .catch(err => { vm.$message.error(err.response.data) })
                 }
             }
-        }
+        },
     }
 </script>

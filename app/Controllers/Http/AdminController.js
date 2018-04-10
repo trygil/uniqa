@@ -49,9 +49,11 @@ class AdminController {
         const user = await auth.authenticator('admin').user
         const reqParam = request.all()
 
-        user.fill({
+        user.name = reqParam.name;
+
+        /*user.fill({
             name: reqParam.name,
-        })
+        })*/
 
         await user.save()
     }

@@ -16,6 +16,7 @@ const Hash = use('Hash')
 
 Factory.blueprint('App/Models/Admin/User', async (faker) => {
     return {
+        name: "Admin",
         username: faker.username(),
         password: "admin",// no need to hash because we're using hash hook in the 'App/Models/Admin/User'
         email: faker.email(),
