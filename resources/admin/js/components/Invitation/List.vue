@@ -1,5 +1,19 @@
 <template>
-    <div>
+    <v-card>
+        <v-card-title>
+            <h2>Daftar Orang</h2>
+            <v-btn color="primary" outline @click="addPerson">
+                <v-icon>person_add</v-icon>
+                {{ $t('action.add') }}
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-text-field
+                append-icon="search"
+                label="Cari.."
+                single-line
+                hide-details
+                v-model="search"></v-text-field>
+        </v-card-title>
         <v-data-table
             :headers="headers"
             :items="items"
@@ -7,15 +21,40 @@
             :pagination.sync="pagination"
             :total-items="totalItems"
             :loading="loading"
-            class="elevation-1"
-        >
+            class="elevation-5">
             <template slot="items" slot-scope="{item}">
-                <td>{{ item.first_name }} {{ item.last_name }}</td>
-                <td>{{ item.email }}</td>
                 <td>
-                    <!-- <v-btn icon small>
-                        <v-icon>edit</v-icon>
-                    </v-btn> -->
+                    <span v-show="item.invited">{{ item.first_name }} {{ item.last_name }}</span>
+                    <v-edit-dialog v-show="!item.invited" :return-value.sync="item.first_name">
+                        {{ item.first_name }} {{ item.last_name }}
+                        <v-text-field
+                            slot="input"
+                            label="First Name"
+                            v-model="item.first_name"
+                            single-line
+                            @keyup.enter="edit(item)"></v-text-field>
+                        <v-text-field
+                            slot="input"
+                            label="Last Name"
+                            v-model="item.last_name"
+                            single-line
+                            @keyup.enter="edit(item)"></v-text-field>
+                    </v-edit-dialog>
+                </td>
+                <td>
+                    <span v-show="item.invited">{{ item.email }}</span>
+                    <v-edit-dialog v-show="!item.invited" :return-value.sync="item.email">
+                        {{ item.email }}
+                        <v-text-field
+                            slot="input"
+                            label="Email"
+                            v-model="item.email"
+                            single-line
+                            @keyup.enter="edit(item)"></v-text-field>
+                    </v-edit-dialog>
+                </td>
+                <td>
+                    <!-- user not invited -->
                     <v-tooltip bottom v-show="!item.invited">
                         <v-btn 
                             small 
@@ -26,11 +65,27 @@
                             :disabled="item.inviting">
                             <v-icon color="success">contact_mail</v-icon>
                         </v-btn>
-                        <span>Invite!</span>
+                        <span>Undang!</span>
                     </v-tooltip>
+
+                    <v-tooltip bottom v-show="!item.invited">
+                        <v-btn 
+                            small 
+                            icon 
+                            slot="activator" 
+                            @click="deletePerson(item)" 
+                            :loading="item.deleting"
+                            :disabled="item.deleting">
+                            <v-icon color="error">delete</v-icon>
+                        </v-btn>
+                        <span>Hapus</span>
+                    </v-tooltip>
+                    <!-- user not invited -->
+
+                    <!-- user invited -->
                     <v-tooltip bottom v-show="item.invited">
                         <v-icon slot="activator">done</v-icon>
-                        <span>Invite Sent!</span>
+                        <span>Undangan terkirim.</span>
                     </v-tooltip>
 
                     <v-tooltip bottom v-show="item.invited">
@@ -43,25 +98,60 @@
                             :disabled="item.canceling">
                             <v-icon color="error">close</v-icon>
                         </v-btn>
-                        <span>Cancel invitation</span>
+                        <span>Batalkan undangan</span>
                     </v-tooltip>
+                    <!-- user invited -->
                 </td>
             </template>
+            <v-alert slot="no-results" :value="true" color="error" icon="warning">
+                "{{ search }}" tidak ditemukan.
+            </v-alert>
         </v-data-table>
-    </div>
+
+        <v-dialog v-model="dialog" max-width="800px">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">{{ form.id ? 'Edit' : 'Tambah' }}</span>
+                </v-card-title>
+                <v-card-text>
+                    <v-container grid-list-md>
+                        <v-layout wrap>
+                            <v-flex md6>
+                                <v-text-field label="Nama Awal" v-model="form.first_name"></v-text-field>
+                            </v-flex>
+                            <v-flex md6>
+                                <v-text-field label="Nama Akhir" v-model="form.last_name"></v-text-field>
+                            </v-flex>
+                            <v-flex md12>
+                                <v-text-field label="Email" v-model="form.email"></v-text-field>
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn outline @click="closeDialog">Cancel</v-btn>
+                    <v-btn color="blue darken-1" outline @click="save">Save</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+    </v-card>
 </template>
 
 <script>
 import Vue from "vue";
+
+let search_timer = null;
 
 export default {
     name: "InvitationList",
     data() {
         return {
             headers: [
-                { text: 'Name', value: 'full_name' },
-                { text: 'Email', value: "email" },
-                { text: '#', value: null, sortable: false },
+                { text: 'Nama', value: 'full_name', width: "30%" },
+                { text: 'Email', value: "email", width: "20%" },
+                { text: '#', value: null, sortable: false, width: "10%" },
             ],
             items: [],
             search: "",
@@ -69,6 +159,8 @@ export default {
             totalItems: 0,
             items: [],
             loading: true,
+            dialog: false,
+            form: {},
         }
     },
     watch: {
@@ -91,6 +183,9 @@ export default {
                 perpage: this.pagination.rowsPerPage,
                 sortby: this.pagination.sortBy,
             };
+
+            if (this.search)
+                params.search = this.search;
 
             return Vue.http("/person/data", {params})
                 .then((res) => {
@@ -142,7 +237,91 @@ export default {
                         this.$set(person, "canceling", false);
                     }
                 )
-        }
+        },
+
+        addPerson() {
+            this.dialog = true;
+        },
+
+        closeDialog() {
+            this.form = {};
+            this.dialog = false;
+        },
+
+        save() {
+            const vm = this;
+
+            Vue.http
+                .post("/person/add", {person: this.form})
+                .then(
+                    () => {
+                        vm.$message.success("Data berhasil tersimpan.");
+                        this.closeDialog();
+                        this.search = "";
+                        this.loadData();
+                    },
+                    () => {
+                        vm.$message.error("Terjadi kesalahan ketika menyimpan data.");
+                        this.closeDialog();
+                    }
+                );
+        },
+
+        edit(person) {
+            const vm = this;
+            this.$set(person, "editing", true);
+
+            Vue.http
+                .post("/person/edit", {person: person})
+                .then(
+                    () => {
+                        vm.$message.success("Data berhasil tersimpan.");
+                        this.$set(person, "editing", false);
+                    },
+                    () => {
+                        vm.$message.error("Terjadi kesalahan ketika akan menyimpan data.");
+                        this.$set(person, "editing", false);
+                    }
+                )
+        },
+
+        deletePerson(person) {
+            const vm = this;
+
+            this.$confirm('Data akan terhapus secara permanen. Yakin?', 'Warning', {
+                confirmButtonText: 'Yakin',
+                cancelButtonText: 'Batal',
+                type: 'warning'
+            }).then(() => {
+                this.$set(person, "deleting", true);
+                Vue.http
+                    .get("/person/delete", {params: {id: person.id}})
+                    .then(
+                        () => {
+                            vm.$message.success("Data telah terhapus.");
+                            this.$set(person, "deleting", false);
+                            this.loadData();
+                        },
+                        () => {
+                            vm.$message.error("Terjadi kesalahan ketika menghapus data.");
+                            this.$set(person, "deleting", false);
+                        }
+                    )
+            }).catch(() => {
+                this.$message.info("Hapus dibatalkan");
+            });
+        },
+    },
+    watch:{
+        search() {
+            let vm = this;
+            if (search_timer)
+                clearTimeout(search_timer);
+
+            search_timer = setTimeout(() => {
+                vm.loadData();
+            }, 500);
+        },
     },
 };
 </script>

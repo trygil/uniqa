@@ -29,6 +29,9 @@ Route.group(() => {
     Route.get('/logout', 'AdminController.logout').middleware(['admin_auth'])
     Route.get('/user/data', 'AdminController.data').middleware(['admin_auth'])
     Route.get('/person/data', 'PersonController.data').middleware(['admin_auth'])
+    Route.post('/person/add', 'PersonController.add').middleware(['admin_auth'])
+    Route.post('/person/edit', 'PersonController.edit').middleware(['admin_auth'])
+    Route.get('/person/delete', 'PersonController.delete').middleware(['admin_auth'])
     Route.post('/invitation/invite', 'PersonController.invite').middleware(['admin_auth'])
     Route.post('/invitation/cancel', 'PersonController.cancel').middleware(['admin_auth'])
 
