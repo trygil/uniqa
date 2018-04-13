@@ -1,36 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Uniqa Admin</title>
-</head>
-<body>
-  <div id="login">
-    <el-row>
-      <el-col :lg="{span: 10, offset: 7}" :md="{span: 16, offset: 4}">
-        @if(flashMessage('message'))
-          <span> {{ flashMessage('message') }} </span>
-        @endif
-      </el-col>
-    </el-row>
-    <el-row>
-      <el-col :lg="{span: 10, offset: 7}" :md="{span: 16, offset: 4}">
-        <el-form method="post" action="/login">
-          {{ csrfField() }}
-          <el-form-item label="Username">
-            <el-input type="text" name="username"></el-input>
-          </el-form-item>
-          <el-form-item label="Password">
-            <el-input type="password" name="password"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button native-type="submit" type="primary">Login</el-button>
-          </el-form-item>
-        </el-form>
-      </el-col>
-    </el-row>
-  </div>
-  {{ css('assets/admin_login_style.css') }}
-  {{ script('assets/admin_login.js') }}
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Uniqa Admin</title>
+        <style type="text/css">
+            body {
+                background-color: #EEEEEE;
+                padding-top: 15%;
+                padding-bottom: 15%;
+            }
+
+            .container {
+                border-radius: 10px;
+                background-color: #ffffff;
+                width: 30%;
+                margin: auto;
+                padding-top: 30px;
+                vertical-align: center;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            }
+        </style>
+    </head>
+
+    <body>
+      <div id="login">
+          <div class="container">
+              <el-row>
+                  <el-col :lg="{span: 16, offset: 4}" :md="{span: 20, offset: 2}">
+                      @if(flashMessage('message'))
+                      <span> {{ flashMessage('message') }} </span>
+                      @endif
+                  </el-col>
+                </el-row>
+
+                <el-row>
+                    <el-col :lg="{span: 16, offset: 4}" :md="{span: 20, offset: 2}">
+                        <el-form method="post" action="/login">
+                            {{ csrfField() }}
+                            <el-form-item>
+                                <el-input type="text" name="username" placeholder="Username"></el-input>
+                            </el-form-item>
+
+                            <el-form-item>
+                                <el-input type="password" name="password" placeholder="Password"></el-input>
+                            </el-form-item>
+
+                            <el-form-item>
+                                <el-button native-type="submit" type="primary">Login</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </el-col>
+                </el-row>
+          </div>
+      </div>
+      {{ css('assets/admin_login_style.css') }}
+      {{ script('assets/admin_login.js') }}
+    </body>
 </html>
