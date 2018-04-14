@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Uniqa Login</title>
+        <link rel="shortcut icon" href="uniqamenwh.jpg" type="image/jpg">
+        <style type="text/css">
+            body {
+                background-color: #EEEEEE;
+                padding-top: 10%;
+            }
+
+            .container {
+                overflow: auto;
+                border-radius: 10px;
+                background-color: #ffffff;
+                width: 50%;
+                margin: auto;
+                vertical-align: center;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            }
+
+            .logo {
+                margin: 0 auto;
+                text-align: center;
+                padding-bottom: 40px;
+                position: relative;
+            }
+
+            .right, .left {
+                width: 50%;
+                margin: 0 auto;
+            }
+
+            .right { float: right; }
+            .left { float: left; }
+        </style>
+    </head>
+
+    <body>
+        <div id="login">
+            <div class="container">
+                <div class="right">
+                    right
+                </div>
+
+                <div class="left">
+                    <div class="logo">
+                        <img src="uniqamente.png" height="100">
+                        <br>UNIQA
+                    </div>
+
+                    <el-row>
+                        <el-col :lg="{span: 16, offset: 4}" :md="{span: 20, offset: 2}">
+                            <el-form method="post" action="/login">
+                                {{ csrfField() }}
+                                <el-form-item>
+                                    <el-input type="text" name="username" placeholder="Username"></el-input>
+                                </el-form-item>
+
+                                <el-form-item>
+                                    <el-input type="password" name="password" placeholder="Password"></el-input>
+                                </el-form-item>
+
+                                <el-form-item>
+                                    <el-button native-type="submit" type="primary" size="medium">Login</el-button>
+                                </el-form-item>
+                            </el-form>
+                        </el-col>
+                    </el-row>
+                </div>
+            </div>
+        </div>
+        {{ css('assets/app_login_style.css') }}
+        {{ script('assets/app_login.js') }}
+    </body>
+</html>

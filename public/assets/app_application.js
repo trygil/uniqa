@@ -66,7 +66,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -2125,7 +2125,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/**\n * The file enables `@/s
 
 /***/ }),
 
-/***/ 4:
+/***/ 6:
 /*!***********************************************!*\
   !*** multi ./resources/app/js/application.js ***!
   \***********************************************/
