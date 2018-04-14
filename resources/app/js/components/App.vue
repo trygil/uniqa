@@ -7,9 +7,9 @@
         v-model="drawer">
         <v-list class="pt-0" flat>
             <template v-for="item in menu">
-                <v-list-group 
-                    v-if="item.children" 
-                    :key="item.title" 
+                <v-list-group
+                    v-if="item.children"
+                    :key="item.title"
                     :prepend-icon="item.icon"
                     :title="item.title">
                     <v-list-tile slot="activator">
@@ -18,10 +18,10 @@
                         </v-list-tile-content>
                     </v-list-tile>
 
-                    <v-list-tile 
+                    <v-list-tile
                         v-if="item.children"
-                        v-for="subitem in item.children" 
-                        :key="subitem.title" 
+                        v-for="subitem in item.children"
+                        :key="subitem.title"
                         :to="subitem.to">
                         <v-list-tile-action>
                             <v-icon>{{ subitem.icon }}</v-icon>
@@ -60,7 +60,7 @@
             <v-btn to="/ask" flat>
                 <v-icon>question_answer</v-icon> Ask Question
             </v-btn>
-            
+
         </v-toolbar-items>
         <v-spacer></v-spacer>
         <v-text-field
@@ -69,7 +69,7 @@
             label="Search"
             prepend-icon="search"></v-text-field>
         <v-toolbar-items>
-            <v-btn flat offset-y v-show="!user.username">
+            <v-btn to="/login" flat offset-y v-show="!user.username">
                 Login
             </v-btn>
             <v-menu offset-y close-on-click v-show="user.username">
@@ -77,7 +77,7 @@
                     <v-avatar class="grey mr-2" size="32px">
                         <!-- <img src="../../images/user.png" alt="avatar"> -->
                     </v-avatar>
-                    <span class="subheading" 
+                    <span class="subheading"
                           style="text-transform: none;">
                         {{ user.username }}
                     </span>
