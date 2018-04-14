@@ -1,1 +1,52 @@
 @import "~element-ui/lib/theme-chalk/index.css";
+
+body {
+    background-color: #EEEEEE;
+    padding-top: 10%;
+}
+
+.container {
+    overflow: auto;
+    border-radius: 10px;
+    background-color: #ffffff;
+    width: 50%;
+    margin: auto;
+    vertical-align: center;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.logo {
+    margin: 0 auto;
+    text-align: center;
+    padding-bottom: 40px;
+    position: relative;
+}
+
+.right, .left {
+    width: 50%;
+    margin: 0 auto;
+    padding-top: 40px;
+    height: 400px;
+    overflow: hidden;
+}
+
+.right {
+    float: right;
+    background-color: #039BE5;
+}
+
+.left {
+    float: left;
+}
+
+.footer {
+    padding-top: 5%;
+    text-align: center;
+    color: #424242;
+    font-size: 10px;
+}
+
+.register {
+    display: block;
+    color: #ffffff;
+}
