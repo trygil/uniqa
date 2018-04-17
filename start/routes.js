@@ -18,6 +18,7 @@ const Person = use('App/Models/Admin/Person')
 
 Route.group(() => {
     Route.on('/').render('uniqamente')
+    Route.get('/login', 'AppController.getLogin')
 
     Route.get('/accept/:token', 'PersonController.acceptInvitation')
 }).domain('uni.qa')

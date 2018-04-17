@@ -1,36 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Uniqa Admin</title>
-</head>
-<body>
-  <div id="login">
-    <el-row>
-      <el-col :lg="{span: 10, offset: 7}" :md="{span: 16, offset: 4}">
-        @if(flashMessage('message'))
-          <span> {{ flashMessage('message') }} </span>
-        @endif
-      </el-col>
-    </el-row>
-    <el-row>
-      <el-col :lg="{span: 10, offset: 7}" :md="{span: 16, offset: 4}">
-        <el-form method="post" action="/login">
-          {{ csrfField() }}
-          <el-form-item label="Username">
-            <el-input type="text" name="username"></el-input>
-          </el-form-item>
-          <el-form-item label="Password">
-            <el-input type="password" name="password"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button native-type="submit" type="primary">Login</el-button>
-          </el-form-item>
-        </el-form>
-      </el-col>
-    </el-row>
-  </div>
-  {{ css('assets/admin_login_style.css') }}
-  {{ script('assets/admin_login.js') }}
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Uniqa Admin</title>
+        <link rel="shortcut icon" href="uniqamente.png" type="image/png">
+    </head>
+
+    <body>
+        <div id="login">
+            <div class="container">
+                <el-row>
+                    <el-col :lg="{span: 16, offset: 4}" :md="{span: 20, offset: 2}">
+                        @if(flashMessage('message'))
+                        <span> {{ flashMessage('message') }} </span>
+                        @endif
+                    </el-col>
+                </el-row>
+
+                <div class="logo">
+                    <img src="uniqamente.png" height="100">
+                    <br>UNIQA
+                </div>
+
+                <el-row>
+                    <el-col :lg="{span: 16, offset: 4}" :md="{span: 20, offset: 2}">
+                        <el-form method="post" action="/login">
+                            {{ csrfField() }}
+                            <el-form-item>
+                                <el-input type="text" name="username" placeholder="Username"></el-input>
+                            </el-form-item>
+
+                            <el-form-item>
+                                <el-input type="password" name="password" placeholder="Password"></el-input>
+                            </el-form-item>
+
+                            <el-form-item>
+                                <el-button native-type="submit" type="primary" size="medium">Login</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </el-col>
+                </el-row>
+            </div>
+        </div>
+
+        <div class="footer">
+            THE AWESOME TEAM 2018
+            <br><br>
+            We are The Awesome Team, we create forum for<br>
+            asking questions and giving answers to<br>
+            help people get information.<br>
+
+        </div>
+        {{ css('assets/admin_login_style.css') }}
+        {{ script('assets/admin_login.js') }}
+    </body>
 </html>

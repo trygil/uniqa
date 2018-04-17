@@ -17,7 +17,13 @@ module.exports = {
       "./resources/admin/js/login.js",
     ],
     admin_login_style: [
-      "./resources/admin/css/login.scss"
+      "./resources/admin/css/login.scss",
+    ],
+    app_login: [
+        "./resources/app/js/login.js",
+    ],
+    app_login_style: [
+        "./resources/app/css/login.scss",
     ],
     app_application: [
       "./resources/app/js/application.js",
