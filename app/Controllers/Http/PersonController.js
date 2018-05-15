@@ -101,7 +101,7 @@ class PersonController {
             user.fill({
                 username: Math.random().toString(36).substring(2),
                 email: person.email,
-                password: await Hash.make(password),
+                password: password,
             })
 
             // Send Password Info

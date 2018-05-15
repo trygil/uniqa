@@ -135,7 +135,6 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-
     </v-card>
 </template>
 
@@ -161,14 +160,6 @@ export default {
             loading: true,
             dialog: false,
             form: {},
-        }
-    },
-    watch: {
-        pagination: {
-            handler () {
-                this.loadData();
-            },
-            deep: true
         }
     },
     mounted () {
@@ -313,6 +304,12 @@ export default {
         },
     },
     watch:{
+        pagination: {
+            handler() {
+                this.loadData();
+            },
+            deep: true,
+        },
         search() {
             let vm = this;
             if (search_timer)

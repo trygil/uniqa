@@ -17,10 +17,18 @@ const Route = use('Route')
 const Person = use('App/Models/Admin/Person')
 
 Route.group(() => {
-    Route.on('/').render('uniqamente')
     Route.get('/login', 'AppController.getLogin')
-
+    Route.post('/login', 'AppController.postLogin')
     Route.get('/accept/:token', 'PersonController.acceptInvitation')
+
+    // auth
+    Route.get('/checkauth', 'AppController.refresh')
+
+    // questions
+    Route.post('/question', 'QuestionController.postQuestion').middleware(['auth'])
+
+    // SPA route
+    Route.any('*', ({ view, auth }) => view.render('uniqamente'));
 }).domain('uni.qa')
 
 Route.group(() => {

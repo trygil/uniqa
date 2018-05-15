@@ -1,48 +1,5 @@
 <template>
 <v-app id="inspire">
-    <!-- <v-navigation-drawer
-        clipped
-        class="grey lighten-4"
-        app
-        v-model="drawer">
-        <v-list class="pt-0" flat>
-            <template v-for="item in menu">
-                <v-list-group
-                    v-if="item.children"
-                    :key="item.title"
-                    :prepend-icon="item.icon"
-                    :title="item.title">
-                    <v-list-tile slot="activator">
-                        <v-list-tile-content>
-                            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-                        </v-list-tile-content>
-                    </v-list-tile>
-
-                    <v-list-tile
-                        v-if="item.children"
-                        v-for="subitem in item.children"
-                        :key="subitem.title"
-                        :to="subitem.to">
-                        <v-list-tile-action>
-                            <v-icon>{{ subitem.icon }}</v-icon>
-                        </v-list-tile-action>
-                        <v-list-tile-content>
-                            <v-list-tile-title>{{ subitem.title }}</v-list-tile-title>
-                        </v-list-tile-content>
-                    </v-list-tile>
-                </v-list-group>
-
-                <v-list-tile v-if="!item.children" :key="item.title" :to="item.to" :title="item.title">
-                    <v-list-tile-action>
-                        <v-icon>{{ item.icon }}</v-icon>
-                    </v-list-tile-action>
-                    <v-list-tile-content>
-                        <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-                    </v-list-tile-content>
-                </v-list-tile>
-            </template>
-        </v-list>
-    </v-navigation-drawer> -->
     <v-toolbar color="blue-grey lighten-5" app absolute clipped-left>
         <!-- <v-toolbar-side-icon @click.native="drawer = !drawer"></v-toolbar-side-icon> -->
         <span class="title ml-3 mr-5">
@@ -53,12 +10,12 @@
         </span>
 
         <v-toolbar-items>
-            <v-btn to="/ask" flat>
-                <v-icon>language</v-icon> Explore!
+            <v-btn to="/" flat>
+                <v-icon>language</v-icon> {{ $t("question.menu.explore") }}
             </v-btn>
 
-            <v-btn to="/ask" flat>
-                <v-icon>question_answer</v-icon> Ask Question
+            <v-btn to="/ask" flat v-show="user.username">
+                <v-icon>question_answer</v-icon> {{ $t("question.menu.ask_question") }}
             </v-btn>
 
         </v-toolbar-items>
@@ -66,12 +23,19 @@
         <v-text-field
             solo-inverted
             flat
-            label="Search"
+            class="mr-3"
+            label="search.."
             prepend-icon="search"></v-text-field>
         <v-toolbar-items>
-            <v-btn to="/login" flat offset-y v-show="!user.username">
-                Login
-            </v-btn>
+            <v-menu 
+                v-show="!user.username"
+                offset-y
+                :close-on-content-click="false">
+                <v-btn slot="activator" :ripple="false" flat>
+                    Login
+                </v-btn>
+                <Login v-show="!user.username"></Login>
+            </v-menu>
             <v-menu offset-y close-on-click v-show="user.username">
                 <v-btn slot="activator" flat>
                     <v-avatar class="grey mr-2" size="32px">
@@ -86,7 +50,7 @@
                 <v-list dense>
                     <v-divider></v-divider>
                     <div>
-                        <a href="/logout" class="list__tile list__tile--link" style="position: relative;">
+                        <a href="/logout" @click.prevent="logout" class="list__tile list__tile--link" style="position: relative;">
                             <div class="list__tile__title text-md-center subheading"> logout </div>
                             <span class="ripple__container">
                                 <span class="ripple__animation ripple__animation--visible" data-activated="1522379837402" style="width: 282px; height: 282px; transform: translate(-50%, -50%) translate(53px, 16px) scale3d(0.99, 0.99, 0.99);"></span>
@@ -100,9 +64,7 @@
     <v-content>
         <v-container fluid fill-height class="grey lighten-4">
             <v-layout justify-center align-center>
-                <v-flex shrink>
-                    <router-view></router-view>
-                </v-flex>
+                <router-view></router-view>
             </v-layout>
         </v-container>
     </v-content>
@@ -110,19 +72,37 @@
 </template>
 
 <script>
-import Vue from "vue";
+import Login from "./Login"
 
 export default {
     name: "App",
+    components: { Login },
     data: () => ({
         drawer: null,
-        user: {},
     }),
+    methods: {
+        logout() {
+            this.$store.dispatch("attemptLogout");
+            this.$router.push("/")
+        },
+    },
+    computed: {
+        user() { return this.$store.state.auth.user; }
+    },
     mounted() {
-        Vue.http("/user/data")
-            .then((res) => {
-                this.user = res.data
-            });
+        this.$http.interceptors.response.use(null, (err) => {
+            if(err.response.status === 401) {
+                this.$notify.error({
+                    title: 'Opps',
+                    message: this.$t("auth.messages.session-expired"),
+                    position: 'bottom-right',
+                });
+
+                this.logout()
+            }
+
+            return Promise.reject(error);
+        });
     },
 }
 </script>
