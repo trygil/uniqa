@@ -101,7 +101,7 @@ export default {
                 this.logout()
             }
 
-            return Promise.reject(error);
+            return Promise.reject(err);
         });
     },
 }
