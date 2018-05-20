@@ -5,7 +5,7 @@ const Schema = use('Schema')
 class AlterAdminUsersSchema extends Schema {
   up () {
     this.table('admin.users', (table) => {
-      table.string('name').notNullable()
+      table.string('name').notNullable().default("-")
     })
   }
 
