@@ -27,7 +27,7 @@
             label="search.."
             prepend-icon="search"></v-text-field>
         <v-toolbar-items>
-            <v-menu 
+            <v-menu
                 v-show="!user.username"
                 offset-y
                 :close-on-content-click="false">
@@ -47,14 +47,21 @@
                     </span>
                     <v-icon>arrow_drop_down</v-icon>
                 </v-btn>
+
                 <v-list dense>
                     <v-divider></v-divider>
                     <div>
+                        <a href="/profile" @click.prevent="profile" class="list__tile list__tile--link" style="position: relative;">
+                            <div class="list__tile__title text-md-center subheading"> profile </div>
+                        </a>
+                    </div>
+
+                    <div>
                         <a href="/logout" @click.prevent="logout" class="list__tile list__tile--link" style="position: relative;">
                             <div class="list__tile__title text-md-center subheading"> logout </div>
-                            <span class="ripple__container">
+                            <!-- <span class="ripple__container">
                                 <span class="ripple__animation ripple__animation--visible" data-activated="1522379837402" style="width: 282px; height: 282px; transform: translate(-50%, -50%) translate(53px, 16px) scale3d(0.99, 0.99, 0.99);"></span>
-                            </span>
+                            </span> -->
                         </a>
                     </div>
                 </v-list>
@@ -84,6 +91,10 @@ export default {
         logout() {
             this.$store.dispatch("attemptLogout");
             this.$router.push("/")
+        },
+
+        profile() {
+            this.$router.push("/profile")
         },
     },
     computed: {

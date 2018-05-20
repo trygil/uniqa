@@ -26,6 +26,10 @@ let routes = [
     {
         path: '/settings',
     },
+    {
+        path: '/profile',
+        component: require('../components/Profile').default,
+    },
 ];
 
 export default new Router({
