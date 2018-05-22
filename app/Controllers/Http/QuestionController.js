@@ -31,7 +31,10 @@ class QuestionController {
             .select(['p.*', 'u.username'])
             .first();
 
-        question.comments = await Database.table('comments').where("post_id", params.id);
+        question.comments = await Database.table('comments as c')
+            .leftJoin('users as u', 'u.id', 'c.user_id')
+            .where("c.post_id", params.id)
+            .select(['c.*', 'u.username']);
 
         // arrange data post & comment
         const posts = {};
