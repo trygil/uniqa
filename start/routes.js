@@ -26,6 +26,9 @@ Route.group(() => {
 
     // questions
     Route.post('/question', 'QuestionController.postQuestion').middleware(['auth'])
+    Route.get('/api/question', 'QuestionController.list')
+    Route.get('/api/question/hot', 'QuestionController.hot')
+    Route.get('/api/question/:id', 'QuestionController.retrieve')
 
     // SPA route
     Route.any('*', ({ view, auth }) => view.render('uniqamente'));

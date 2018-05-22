@@ -7,7 +7,15 @@ Vue.use(Router);
 let routes = [
     {
         path: '/',
-        component: require('../components/Feed').default,
+        component: require('../components/Homepage').default,
+    },
+    {
+        path: '/question/:id',
+        component: require('../components/question/Detail').default,
+    },
+    {
+        path: '/question',
+        component: require('../components/question/Explore').default,
     },
     {
         path: '/ask',

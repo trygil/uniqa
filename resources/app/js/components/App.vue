@@ -2,23 +2,23 @@
 <v-app id="inspire">
     <v-toolbar color="blue-grey lighten-5" app absolute clipped-left>
         <!-- <v-toolbar-side-icon @click.native="drawer = !drawer"></v-toolbar-side-icon> -->
-        <span class="title ml-3 mr-5">
-             <v-avatar tile :size="50">
-                  <img src="/uniqamente.png" alt="avatar">
-                </v-avatar>
-            <span class="text">Uniqa!</span>
-        </span>
+        <router-link to="/" class="title ml-3 mr-5">
+            <v-avatar tile :size="50">
+                <img src="/uniqamente.png" alt="avatar" />
+            </v-avatar>
+            <span class="text black--text">UNIQA</span>
+        </router-link>
 
         <v-toolbar-items>
-            <v-btn to="/" flat>
+            <v-btn to="/question" flat>
                 <v-icon>language</v-icon> {{ $t("question.menu.explore") }}
             </v-btn>
 
             <v-btn to="/ask" flat v-show="user.username">
                 <v-icon>question_answer</v-icon> {{ $t("question.menu.ask_question") }}
             </v-btn>
-
         </v-toolbar-items>
+
         <v-spacer></v-spacer>
         <v-text-field
             solo-inverted
@@ -27,7 +27,7 @@
             label="search.."
             prepend-icon="search"></v-text-field>
         <v-toolbar-items>
-            <v-menu 
+            <v-menu
                 v-show="!user.username"
                 offset-y
                 :close-on-content-click="false">
@@ -72,37 +72,39 @@
 </template>
 
 <script>
-import Login from "./Login"
+import Login from "./Login";
 
 export default {
     name: "App",
     components: { Login },
     data: () => ({
-        drawer: null,
+        drawer: null
     }),
     methods: {
         logout() {
             this.$store.dispatch("attemptLogout");
-            this.$router.push("/")
-        },
+            this.$router.push("/");
+        }
     },
     computed: {
-        user() { return this.$store.state.auth.user; }
+        user() {
+            return this.$store.state.auth.user;
+        }
     },
     mounted() {
-        this.$http.interceptors.response.use(null, (err) => {
-            if(err.response.status === 401) {
+        this.$http.interceptors.response.use(null, err => {
+            if (err.response.status === 401) {
                 this.$notify.error({
-                    title: 'Opps',
+                    title: "Opps",
                     message: this.$t("auth.messages.session-expired"),
-                    position: 'bottom-right',
+                    position: "bottom-right"
                 });
 
-                this.logout()
+                this.logout();
             }
 
             return Promise.reject(err);
         });
-    },
-}
+    }
+};
 </script>
