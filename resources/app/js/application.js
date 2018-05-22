@@ -64,7 +64,6 @@ function refreshToken() {
             store.commit('SET_TOKEN', token);
             store.commit('SET_REFRESH_TOKEN', refresh_token);
 
-            console.log("TOKEN REFRESHED!!")
             setTimeout(refreshToken, 5 * 1000);
         });
 }

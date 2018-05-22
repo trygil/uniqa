@@ -55,9 +55,9 @@ export default {
                     this.$message.success(this.$t("question.messages.save_success"));
 
                     // redirecting after 2 seconds
-                    setTimout(this.back, 2000);
+                    setTimeout(this.back, 2000);
                 })
-                .catch((res) => {
+                .catch((err) => {
                     this.$message.error(this.$t("question.messages.save_failed"));
                 });
         },
