@@ -123,11 +123,43 @@ class QuestionController {
             trx.commit();
         } catch(e) {
             trx.rollback();
-            console.error(e);
-            return response.send('save failed', 500);
+            return response.status(500).send('save failed');
         }
 
-        return response.send('save success', 200);
+        return response.send('save success');
+    }
+
+    async postAnswer({request, response, auth}) {
+        const params = request.all();
+        const user = await auth.getUser();
+
+        const trx = await Database.beginTransaction()
+
+        const parent_post = await Post.find(params.post_id);
+
+        if (!parent_post)
+            return response.status(500).send('save failed');
+
+        // create new post
+        let post = new Post();
+
+        try {
+            post.fill({
+                title: params.title,
+                post: params.post,
+                user_id: user.id,
+                parent_id: parent_post.id,
+            });
+
+            await post.save(trx);
+
+            trx.commit();
+        } catch(e) {
+            trx.rollback();
+            return response.status(500).send('save failed');
+        }
+
+        return response.send('save success');
     }
 }
 
