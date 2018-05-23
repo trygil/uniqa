@@ -34,6 +34,9 @@
 
                     <!-- User-->
                     <v-flex xs6 offset-xs6 text-xs-center pa-3>
+                        <v-btn v-if="!data.posts" @click="$emit('choosen', data)" icon title="choose as an answer">
+                            <v-icon x-large :color="data.status ? 'success' : 'default'">check</v-icon>
+                        </v-btn>
                         <v-chip>
                             <v-avatar class="teal">{{ (data.username || "").substr(0, 1) }}</v-avatar>
                             <router-link :to="'/user/' + data.user_id">{{ data.username }}</router-link>
@@ -79,15 +82,16 @@
         },
         methods: {
             upvote(val) {
-                if (this.upvoted == 0)
-                    this.data.upvote += val;
-                else
-                    this.data.upvote -= val;
+                this.data.upvote += val;
+                let range = Math.abs(this.upvoted - val);
 
-                if (this.upvoted == val)
+                if (this.upvoted == val || range > 1)
                     this.upvoted = 0;
                 else
                     this.upvoted = val;
+
+                if (this.upvoted == 0)
+                    this.data.upvote += val * (range > 1 ? 0 : -2);
             },
         },
     }

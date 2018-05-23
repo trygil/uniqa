@@ -11,7 +11,7 @@
 
                     <div v-for="item in data.posts">
                         <hr />
-                        <Post :data="item" />
+                        <Post :data="item" @choosen="changeStatus" />
                     </div>
                 </template>
 
@@ -102,6 +102,14 @@
                     .catch((err) => {
                         this.$message.error(this.$t("question.messages.answer_failed"));
                     });
+            },
+            changeStatus(post) {
+                // reseting posts status
+                this.data.posts.map((post) => {
+                    post.status = 0;
+                });
+
+                post.status = !post.status;
             },
         },
     }
