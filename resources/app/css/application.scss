@@ -1,2 +1,10 @@
 @import "~vuetify/dist/vuetify.min.css";
 @import "~element-ui/lib/theme-chalk/index.css";
+
+a {
+    text-decoration: none;
+}
+hr {
+    border: solid 1px #ddd;
+    margin: 15px -15px;
+}

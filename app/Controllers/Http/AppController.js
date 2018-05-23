@@ -18,6 +18,7 @@ class AppController {
         const payload = {
             username: user.username,
             email: user.email,
+            id: user.id,
         };
 
         let token = await auth.withRefreshToken().attempt(params.email, params.password, payload);
@@ -31,6 +32,7 @@ class AppController {
         const payload = {
             username: user.username,
             email: user.email,
+            id: user.id,
         };
 
         return await auth.generateForRefreshToken(token, payload);
