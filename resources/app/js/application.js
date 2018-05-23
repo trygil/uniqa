@@ -18,6 +18,7 @@ import store from './store'
 import router from './router'
 import i18n from "./lang"
 import jwt_decode from "jwt-decode";
+import moment from "moment";
 
 Vue.use(Vuetify)
 Vue.use(Row)
@@ -28,10 +29,13 @@ Vue.use(FormItem)
 Vue.use(Button)
 Vue.use(Alert)
 
+moment.locale('id');
+
 Vue.prototype.$message = Message;
 Vue.prototype.$notify = Notification;
 Vue.prototype.$ELEMENT = {locale: el_locale};
 Vue.http = Vue.prototype.$http = axios;
+Vue.prototype.$moment = moment;
 
 // check login token
 store.dispatch("checkLoginToken");

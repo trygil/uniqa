@@ -1,9 +1,17 @@
 <template>
     <v-layout row>
         <v-flex sm2 md1 text-xs-center>
-            <p class="mb-0"><v-icon x-large>expand_less</v-icon></p>
+            <p class="mb-0">
+                <v-btn icon @click="upvote(1)">
+                    <v-icon x-large>expand_less</v-icon>
+                </v-btn>
+            </p>
             <span class="title">{{ data.upvote }}</span>
-            <p class="mb-0"><v-icon x-large>expand_more</v-icon></p>
+            <p class="mb-0">
+                <v-btn icon @click="upvote(-1)">
+                    <v-icon x-large>expand_more</v-icon>
+                </v-btn>
+            </p>
         </v-flex>
 
         <v-flex xs10 pr-4>
@@ -25,11 +33,15 @@
                     </v-flex>
 
                     <!-- User-->
-                    <v-flex xs6 offset-xs6 text-xs-right pa-3>
+                    <v-flex xs6 offset-xs6 text-xs-center pa-3>
                         <v-chip>
-                            <v-avatar class="teal">A</v-avatar>
+                            <v-avatar class="teal">{{ (data.username || "").substr(0, 1) }}</v-avatar>
                             <router-link :to="'/user/' + data.user_id">{{ data.username }}</router-link>
                         </v-chip>
+                        <br>
+                        <span class="caption">
+                            {{ $moment(data.created_at).fromNow() }}
+                        </span>
                     </v-flex>
                 </v-layout>
             </div>
@@ -55,9 +67,27 @@
     export default {
         name: 'Post',
         props: { data: Object },
+        data() {
+            return {
+                upvoted: 0,
+            };
+        },
         computed: {
             user() {
                 return this.$store.state.auth.user;
+            },
+        },
+        methods: {
+            upvote(val) {
+                if (this.upvoted == 0)
+                    this.data.upvote += val;
+                else
+                    this.data.upvote -= val;
+
+                if (this.upvoted == val)
+                    this.upvoted = 0;
+                else
+                    this.upvoted = val;
             },
         },
     }
