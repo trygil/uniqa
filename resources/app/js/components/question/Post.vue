@@ -23,7 +23,7 @@
                     <v-flex xs6 py-3>
                         <template v-if="data.data !== null">
                             <router-link
-                                :to="'/tags/' + encodeURIComponent(tag.tag)"
+                                :to="'/questions/?tags=' + encodeURIComponent(tag.tag)"
                                 class="pa-2 elevation-1 caption blue lighten-5"
                                 v-for="tag in data.data.tags"
                             >
@@ -34,7 +34,11 @@
 
                     <!-- User-->
                     <v-flex xs6 offset-xs6 text-xs-center pa-3>
-                        <v-btn v-if="!data.posts" @click="$emit('choosen', data)" icon title="choose as an answer">
+                        <v-btn 
+                            v-if="!data.posts && data.user_id == user.id" 
+                            title="choose as an answer"
+                            @click="$emit('choosen', data)" 
+                            icon>
                             <v-icon x-large :color="data.status ? 'success' : 'default'">check</v-icon>
                         </v-btn>
                         <v-chip>
@@ -70,28 +74,37 @@
     export default {
         name: 'Post',
         props: { data: Object },
-        data() {
-            return {
-                upvoted: 0,
-            };
-        },
         computed: {
             user() {
                 return this.$store.state.auth.user;
             },
         },
         methods: {
-            upvote(val) {
+            async upvote(val) {
                 this.data.upvote += val;
-                let range = Math.abs(this.upvoted - val);
+                let range = Math.abs(this.data.upvoted - val);
 
-                if (this.upvoted == val || range > 1)
-                    this.upvoted = 0;
+                if (this.data.upvoted == val || range > 1)
+                    this.data.upvoted = 0;
                 else
-                    this.upvoted = val;
+                    this.data.upvoted = val;
 
-                if (this.upvoted == 0)
+                if (this.data.upvoted == 0)
                     this.data.upvote += val * (range > 1 ? 0 : -2);
+
+                // value reset
+                if (this.data.upvoted == 0)
+                    val = 0;
+
+                // send upvote
+                let response = await this.$http.post("/question/upvote/" + this.data.id, { val })
+                    .then((res) => {
+                        console.log(res)
+                        this.data.upvote = res.data;
+                    })
+                    .catch((err) => {
+                        this.$message.error(this.$t("question.messages.action_failed"));
+                    });
             },
         },
     }

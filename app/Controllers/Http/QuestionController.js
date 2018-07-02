@@ -8,6 +8,8 @@ const _ = use('lodash')
 class QuestionController {
     async hot({ request }) {
         return await Database.table('posts as p')
+            .select(['up.*', 'p.*'])
+            .leftJoin('users as up', 'up.id', 'p.user_id')
             .where("p.parent_id", null)
             .orderBy(Database.raw('to_char(p.created_at, \'YYYY-MM\')'), 'desc')
             .orderBy('p.upvote', 'desc')
@@ -24,11 +26,17 @@ class QuestionController {
         return await query.paginate(params.page || 1, params.perpage || 10);
     }
 
-    async retrieve({ params }) {
+    async retrieve({ params, auth }) {
+        const user = await auth.getUser();
+
         const question = await Database.table('posts as p')
             .leftJoin('users as u', 'u.id', 'p.user_id')
+            .leftJoin('post_upvotes as pu', (qry) => {
+                qry.on('pu.post_id', 'p.id');
+                qry.on('pu.user_id', user.id);
+            })
             .where('p.id', params.id)
-            .select(['p.*', 'u.username'])
+            .select(['p.*', 'u.username', Database.raw("pu.val AS upvoted")])
             .first();
 
         question.comments = await Database.table('comments as c')
@@ -43,10 +51,15 @@ class QuestionController {
             .leftJoin('comments as c', 'c.post_id', 'p.id')
             .leftJoin('users as up', 'up.id', 'p.user_id')
             .leftJoin('users as uc', 'uc.id', 'c.user_id')
+            .leftJoin('post_upvotes as pu', (qry) => {
+                qry.on('pu.post_id', 'p.id');
+                qry.on('pu.user_id', user.id);
+            })
             .where("p.parent_id", params.id)
             .orderBy('c.created_at', 'desc')
             .select([
                 "p.*",
+                Database.raw("pu.val AS upvoted"),
                 "up.username as username",
                 "uc.username as c_username",
                 "c.user_id as c_user_id",
@@ -160,6 +173,138 @@ class QuestionController {
         }
 
         return response.send('save success');
+    }
+
+    async postUpvote({params, request, response, auth}) {
+        const url_params = request.all();
+        const user = await auth.getUser();
+        const val = url_params.val;
+
+        const trx = await Database.beginTransaction()
+
+        const post = await Post.find(params.id);
+
+        if (!post)
+            return response.status(500).send('upvote failed');
+
+        try {
+            let sql = 
+                "INSERT INTO post_upvotes " +
+                "(post_id, user_id, val, created_at, updated_at) " +
+                "VALUES (?, ?, ?, current_timestamp, current_timestamp) " + 
+                "ON CONFLICT (post_id, user_id) DO UPDATE SET " + 
+                "updated_at = current_timestamp, " + 
+                "val = excluded.val";
+
+            // save upvote
+            await trx.raw(sql, [post.id, user.id, val]);
+
+            // get total upvotes
+            sql = "SELECT COALESCE(SUM(val), 0) AS upvotes FROM post_upvotes WHERE post_id = ?";
+
+            let total_upvotes = 0;
+            let response = await trx.raw(sql, [post.id]);
+
+            if (response)
+                total_upvotes = response.rows[0].upvotes;
+
+            // update total upvotes
+            post.upvote = total_upvotes;
+            await post.save(trx);
+
+            trx.commit();
+        } catch(e) {
+            trx.rollback();
+            console.error(e)
+
+            return response.status(500).send(post.upvote);
+        }
+
+        return response.send(post.upvote);
+    }
+
+    async postChoose({params, request, response, auth}) {
+        const url_params = request.all();
+        const user = await auth.getUser();
+
+        // start transaction
+        const trx = await Database.beginTransaction()
+        // get question post
+        const post = await Post.query()
+                            .where("id", params.id)
+                            .where("user_id", user.id)
+                            .first();
+
+        console.log(post)
+
+        try {
+            if (!post)
+                throw new Error("post not found");
+
+            // update each of answer status to default value
+            await trx.table('posts').where("parent_id", post.id).update({
+                status: 0,
+            });
+
+            // reset answer status
+            post.status = 0;
+
+            if (url_params.id) {
+                // get choosen answer post
+                const choosen_post = await Post.find(url_params.id);
+
+                if (!choosen_post)
+                    throw new Error("choosen id not found");
+
+                choosen_post.status = 1;
+                await choosen_post.save(trx);
+
+                post.status = 1;
+            }
+
+            await post.save(trx);
+
+            trx.commit();
+        } catch(e) {
+            trx.rollback();
+            console.error(e)
+
+            return response.status(500).send(0);
+        }
+
+        return response.send(post.status);
+    }
+
+    async deleteQuestion({params, request, response, auth}) {
+        const user = await auth.getUser();
+
+        // start transaction
+        const trx = await Database.beginTransaction()
+
+        // get question post
+        const post = await Post.query()
+                                .where("id", params.id)
+                                .where("user_id", user.id)
+                                .first();
+
+        try {
+            if (!post)
+                throw new Error("post not found");
+
+            // delete questions and all related post
+            await trx.table('posts')
+                    .where("id", post.id)
+                    .orWhere("parent_id", post.id).delete();
+
+            trx.commit();
+        } catch(e) {
+            trx.rollback();
+            console.error(e)
+
+            return response.status(500).send("failed to delete status");
+        }
+
+        return response.send("post deleted");
     }
 }
 

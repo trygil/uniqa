@@ -3,6 +3,9 @@ export default {
         menu: {
             explore: "Eksplor pertanyaan",
             ask_question: "Tanyakan sesuatu",
+            top_question: "Pertanyaan Terpopuler",
+            recent_question: "Pertanyaan Terbaru",
+            most_followed_question: "Paling Banyak Diikuti",
         },
         labels: {
             question: "Apa yang mau anda tanyakan?",
@@ -17,12 +20,17 @@ export default {
             save_failed: "Terjadi kesalahan ketika hendak menyimpan pertanyaan anda. Coba buat pertanyaan tentang kesalahan ini.",
             answer_success: "Jawaban anda sudah diposting!",
             answer_failed: "Terjadi kesalahan ketika mengirim jawaban anda. Coba lagi dalam beberapa saat.",
+            delete_success: "Pertanyaan anda telah terhapus!",
+            action_failed: "Terjadi kesalahan! Coba lagi dalam beberapa saat.",
         },
     },
     en: {
         menu: {
             explore: "Explore",
             ask_question: "Ask question",
+            top_question: "Top Questions",
+            recent_question: "Recent Questions",
+            most_followed_question: "Most Followed Questions",
         },
         labels: {
             question: "What do you want to ask?",

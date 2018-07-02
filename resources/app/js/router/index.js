@@ -14,7 +14,7 @@ let routes = [
         component: require('../components/question/Detail').default,
     },
     {
-        path: '/question',
+        path: '/questions/:type?',
         component: require('../components/question/Explore').default,
     },
     {

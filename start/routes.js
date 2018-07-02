@@ -27,6 +27,9 @@ Route.group(() => {
     // questions
     Route.post('/question', 'QuestionController.postQuestion').middleware(['auth'])
     Route.post('/question/answer', 'QuestionController.postAnswer').middleware(['auth'])
+    Route.post('/question/upvote/:id', 'QuestionController.postUpvote').middleware(['auth'])
+    Route.post('/question/choose/:id', 'QuestionController.postChoose').middleware(['auth'])
+    Route.delete('/question/:id', 'QuestionController.deleteQuestion').middleware(['auth'])
     Route.get('/api/question', 'QuestionController.list')
     Route.get('/api/question/hot', 'QuestionController.hot')
     Route.get('/api/question/:id', 'QuestionController.retrieve')

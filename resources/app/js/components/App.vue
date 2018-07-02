@@ -1,6 +1,6 @@
 <template>
 <v-app id="inspire">
-    <v-toolbar color="blue-grey lighten-5" app absolute clipped-left>
+    <v-toolbar color="blue-grey lighten-5" app fixed clipped-left>
         <!-- <v-toolbar-side-icon @click.native="drawer = !drawer"></v-toolbar-side-icon> -->
         <router-link to="/" class="title ml-3 mr-5">
             <v-avatar tile :size="50">
@@ -10,7 +10,7 @@
         </router-link>
 
         <v-toolbar-items>
-            <v-btn to="/question" flat>
+            <v-btn to="/questions" flat>
                 <v-icon>language</v-icon> {{ $t("question.menu.explore") }}
             </v-btn>
 
@@ -20,12 +20,12 @@
         </v-toolbar-items>
 
         <v-spacer></v-spacer>
-        <v-text-field
+        <!-- <v-text-field
             solo-inverted
             flat
             class="mr-3"
             label="search.."
-            prepend-icon="search"></v-text-field>
+            prepend-icon="search"></v-text-field> -->
         <v-toolbar-items>
             <v-menu
                 v-show="!user.username"

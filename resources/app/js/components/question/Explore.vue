@@ -1,7 +1,7 @@
 <template>
     <v-layout row>
         <v-flex sm8>
-            <List :data="data" />
+            <List :data="data" @refresh-list="loadQuestions()" />
 
             <div class="text-xs-center mt-5" v-if="pagination.lastPage > 1">
                 <v-pagination :length="pagination.lastPage" v-model="pagination.page" @input="loadQuestions" />

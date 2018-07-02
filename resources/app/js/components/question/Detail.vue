@@ -1,6 +1,6 @@
 <template>
     <v-layout row class="pa-2">
-        <v-flex sm8>
+        <v-flex sm6 offset-sm2>
             <div class="px-4">
                 <h1 class="title">{{ data.title }}</h1> <hr />
 
@@ -103,13 +103,23 @@
                         this.$message.error(this.$t("question.messages.answer_failed"));
                     });
             },
-            changeStatus(post) {
+            async changeStatus(post) {
                 // reseting posts status
                 this.data.posts.map((post) => {
                     post.status = 0;
                 });
 
-                post.status = !post.status;
+                post.status = 1;
+
+                // change answer
+                let response = await this.$http.post("/question/choose/" + this.data.id, { id: post.id })
+                    .then((res) => {
+                        post.status = this.data.status = res.data;
+                    })
+                    .catch((err) => {
+                        post.status = this.data.status = err.response.data;
+                        this.$message.error(this.$t("question.messages.action_failed"));
+                    });
             },
         },
     }
