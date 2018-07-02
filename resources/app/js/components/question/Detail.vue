@@ -15,8 +15,8 @@
                     </div>
                 </template>
 
-                <template v-show="user.id && post.user_id != user.id">
-                    <v-flex lg10 offset-lg1>
+                <template>
+                    <v-flex lg10 offset-lg1 v-show="user.id">
                         <v-form @submit.prevent="answer">
                             <v-text-field
                                 v-model="form.post"

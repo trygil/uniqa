@@ -30,9 +30,10 @@ Route.group(() => {
     Route.post('/question/upvote/:id', 'QuestionController.postUpvote').middleware(['auth'])
     Route.post('/question/choose/:id', 'QuestionController.postChoose').middleware(['auth'])
     Route.delete('/question/:id', 'QuestionController.deleteQuestion').middleware(['auth'])
-    Route.get('/api/question', 'QuestionController.list')
-    Route.get('/api/question/hot', 'QuestionController.hot')
+    Route.get('/api/question/recent', 'QuestionController.recent')
+    Route.get('/api/question/top', 'QuestionController.top')
     Route.get('/api/question/:id', 'QuestionController.retrieve')
+    Route.get('/api/tag', 'TagController.tagList')
 
     // SPA route
     Route.any('*', ({ view, auth }) => view.render('uniqamente'));

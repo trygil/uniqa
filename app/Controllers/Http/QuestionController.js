@@ -5,35 +5,125 @@ const Post = use('App/Models/Post')
 const Tag = use('App/Models/Tag')
 const _ = use('lodash')
 
+let cte = `
+    WITH unanswered_post AS (
+        -- unanswered post
+        SELECT 
+            0 AS answer_count, 
+            p.upvote AS total_votes,
+            up.id, 
+            up.username,
+            p.* 
+        FROM posts AS p
+        LEFT JOIN posts AS a ON a.parent_id = p.id
+        LEFT JOIN users AS up ON up.id = p.user_id
+        WHERE a.id IS NULL AND p.parent_id IS NULL
+    ),
+
+    answered_post AS (
+        -- answered post
+        SELECT 
+            COUNT(a.*) AS answer_count, 
+            SUM(a.upvote) + p.upvote AS total_votes, 
+            up.id, 
+            up.username,
+            p.* 
+        FROM posts AS p
+        JOIN posts AS a ON a.parent_id = p.id
+        LEFT JOIN users AS up ON up.id = p.user_id
+        WHERE p.parent_id IS NULL
+        GROUP BY p.id, up.id
+    ),
+
+    joined_post AS (
+        SELECT * FROM unanswered_post
+        UNION
+        SELECT * FROM answered_post
+    ),
+
+    top_post AS (
+        SELECT * FROM joined_post AS t
+        ORDER BY 
+            total_votes DESC, 
+            answer_count DESC,
+            created_at DESC
+    ),
+
+    recent_post AS (
+        SELECT * FROM joined_post AS t
+        ORDER BY 
+             created_at DESC,
+             total_votes DESC, 
+             answer_count DESC
+    ) `;
+
 class QuestionController {
-    async hot({ request }) {
-        return await Database.table('posts as p')
-            .select(['up.*', 'p.*'])
-            .leftJoin('users as up', 'up.id', 'p.user_id')
-            .where("p.parent_id", null)
-            .orderBy(Database.raw('to_char(p.created_at, \'YYYY-MM\')'), 'desc')
-            .orderBy('p.upvote', 'desc')
-            .limit(request.input('size', 10))
+    async top({ request }) {
+        const params = request.all();
+
+        let sql = `SELECT * FROM top_post AS p `;
+
+        let page = params.page || 1;
+        let perpage = params.perpage || 5;
+        let bindings = [];
+
+        if (params.tags) {
+            sql += `WHERE lower(data->>'tags')::jsonb @> ?`;
+            bindings.push('["' + params.tags.toLowerCase() + '"]');
+        }
+
+        sql += `LIMIT ? OFFSET ?`;
+        bindings.push(page * perpage);
+        bindings.push(perpage * (page - 1));
+
+        let res = await Database.raw(cte + sql, bindings);
+
+        return res.rows;
     }
 
-    async list({ request }) {
+    async recent({ request }) {
         const params = request.all();
-        const query = Database.table('posts as p')
-            .where("p.parent_id", null)
-            .orderBy('p.created_at', 'desc')
-            .orderBy('p.upvote', 'desc')
 
-        return await query.paginate(params.page || 1, params.perpage || 10);
+        // pagination params
+        let page = params.page || 1;
+        let perpage = params.perpage || 5;
+        let bindings = [];
+
+        let sql = `SELECT * FROM recent_post AS p `;
+
+        if (params.tags) {
+            sql += `WHERE lower(data->>'tags')::jsonb @> ?`;
+            bindings.push('["' + params.tags.toLowerCase() + '"]');
+        }
+
+        // set limit & offset
+        sql += `LIMIT ? OFFSET ?`;
+        bindings.push(page * perpage);
+        bindings.push(perpage * (page - 1));
+
+        let res = null
+        try {
+            res = await Database.raw(cte + sql, bindings);
+        } catch(e) {
+            console.error(e);
+        }
+
+        return res.rows;
     }
 
     async retrieve({ params, auth }) {
-        const user = await auth.getUser();
+        let user_id = 0;
+
+        try {
+            const user = await auth.getUser();
+            if (user) user_id = user.id;
+        } catch(e) {}
 
         const question = await Database.table('posts as p')
             .leftJoin('users as u', 'u.id', 'p.user_id')
             .leftJoin('post_upvotes as pu', (qry) => {
                 qry.on('pu.post_id', 'p.id');
-                qry.on('pu.user_id', user.id);
+                qry.on('pu.user_id', user_id);
             })
             .where('p.id', params.id)
             .select(['p.*', 'u.username', Database.raw("pu.val AS upvoted")])
@@ -53,7 +143,7 @@ class QuestionController {
             .leftJoin('users as uc', 'uc.id', 'c.user_id')
             .leftJoin('post_upvotes as pu', (qry) => {
                 qry.on('pu.post_id', 'p.id');
-                qry.on('pu.user_id', user.id);
+                qry.on('pu.user_id', user_id);
             })
             .where("p.parent_id", params.id)
             .orderBy('c.created_at', 'desc')
@@ -115,12 +205,12 @@ class QuestionController {
                 // delete existing tags
                 await Database.raw(query, params.tags)
 
-                let tags = params.tags.map((tag) => { return {"tag": tag} });
+                let tags = params.tags.map((tag) => { return { tag } });
 
                 // insert tags
                 await Tag.createMany(tags, trx)
 
-                post_data.tags = tags;
+                post_data.tags = tags.map((item) => item.tag);
             }
 
             post.fill({
@@ -136,6 +226,8 @@ class QuestionController {
             trx.commit();
         } catch(e) {
             trx.rollback();
+            console.error(e);
+
             return response.status(500).send('save failed');
         }
 

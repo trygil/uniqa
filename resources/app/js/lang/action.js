@@ -8,6 +8,7 @@ export default {
         "create-new": "Buat Baru",
         "view":       "Lihat",
         "done":       "Selesai",
+        "more":       "selengkapnya",
     },
     en: {
         "save":       "Save",
@@ -18,5 +19,6 @@ export default {
         "create-new": "Create New",
         "view":       "View",
         "done":       "Done",
+        "more":       "more",
     },
 }

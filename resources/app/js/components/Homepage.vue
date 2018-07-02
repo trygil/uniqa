@@ -13,7 +13,7 @@
             </v-layout>
         </v-flex>
         <v-flex lg6 xs12>
-            <List :data="data" @refresh-list="loadQuestions()" />
+            <List :data="data" @refresh-list="loadQuestions(1)" />
         </v-flex>
         <v-flex lg3 xs12>
             <Topics></Topics>
@@ -45,10 +45,15 @@
             // this.loadTags();
         },
         methods: {
-            loadQuestions() {
+            loadQuestions(page) {
                 this.loading = true;
 
-                return Vue.http("/api/question/hot")
+                const params = {
+                    perpage: 5,
+                    page: page || 1,
+                };
+
+                return Vue.http("/api/question/recent", { params })
                     .then((res) => {
                         this.loading = false;
                         this.data = res.data;

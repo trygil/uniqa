@@ -26,7 +26,7 @@ let routes = [
 
             // if user not defined
             if (!store.state.auth.token)
-                return
+                return;
 
             next();
         }

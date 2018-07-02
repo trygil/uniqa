@@ -19,21 +19,8 @@
                 <div v-html="data.post" />
 
                 <v-layout row>
-                    <!-- Tags -->
-                    <v-flex xs6 py-3>
-                        <template v-if="data.data !== null">
-                            <router-link
-                                :to="'/questions/?tags=' + encodeURIComponent(tag.tag)"
-                                class="pa-2 elevation-1 caption blue lighten-5"
-                                v-for="tag in data.data.tags"
-                            >
-                                {{ tag.tag }}
-                            </router-link>
-                        </template>
-                    </v-flex>
-
                     <!-- User-->
-                    <v-flex xs6 offset-xs6 text-xs-center pa-3>
+                    <v-flex lg6 offset-xs6 text-xs-center pa-3>
                         <v-btn 
                             v-if="!data.posts && data.user_id == user.id" 
                             title="choose as an answer"
@@ -49,6 +36,20 @@
                         <span class="caption">
                             {{ $moment(data.created_at).fromNow() }}
                         </span>
+                    </v-flex>
+                </v-layout>
+                <v-layout row>
+                    <!-- Tags -->
+                    <v-flex xs12 py-3>
+                        <template v-if="data.data !== null">
+                            <router-link
+                                :to="'/questions/?tags=' + encodeURIComponent(tag)"
+                                class="pa-2 elevation-1 caption blue lighten-5"
+                                v-for="tag in data.data.tags"
+                            >
+                                {{ tag }}
+                            </router-link>
+                        </template>
                     </v-flex>
                 </v-layout>
             </div>

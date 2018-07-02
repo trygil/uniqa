@@ -14,7 +14,12 @@
                                     <p class="title">{{ item.title }}</p>
                                 </router-link>
                                 <p class="body-2 gray--text darken-3">
-                                    {{ item.post.length > 200 ? item.post.substring(0, 200)+"..." : item.post }}
+                                    {{ item.post.length > 200 ? item.post.substring(0, 200)+" ... " : item.post }}
+                                    <router-link 
+                                        v-if="item.post.length > 200" 
+                                        :to="'/question/'+ item.id">
+                                        {{ $t("action.more") }}
+                                    </router-link>
                                 </p>
                             </v-flex>
                             <v-spacer></v-spacer>
