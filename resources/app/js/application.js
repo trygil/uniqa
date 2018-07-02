@@ -68,7 +68,8 @@ function refreshToken() {
             store.commit('SET_TOKEN', token);
             store.commit('SET_REFRESH_TOKEN', refresh_token);
 
-            setTimeout(refreshToken, 5 * 1000);
+            Vue.http.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+            setTimeout(refreshToken, 60 * 1000);
         });
 }
 
