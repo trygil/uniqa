@@ -82,7 +82,7 @@ function refreshToken() {
 }
 
 if (store.state.auth.token) {
-    setTimeout(refreshToken, 5 * 1000);
+    setTimeout(refreshToken, 1.5 * 1000);
 }
 
 

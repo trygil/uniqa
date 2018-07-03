@@ -11,7 +11,7 @@
 
                     <div v-for="item in data.posts">
                         <hr />
-                        <Post :data="item" @choosen="changeStatus" />
+                        <Post :posterid="data.user_id" :data="item" @choosen="changeStatus" />
                     </div>
                 </template>
 
@@ -109,10 +109,13 @@
                     post.status = 0;
                 });
 
-                post.status = 1;
+                // toggle status
+                post.status = post.status == 1 ? 0 : 1;
 
                 // change answer
-                let response = await this.$http.post("/question/choose/" + this.data.id, { id: post.id })
+                let response = await this.$http.post("/question/choose/" + this.data.id, { 
+                    id: post.id
+                })
                     .then((res) => {
                         post.status = this.data.status = res.data;
                     })

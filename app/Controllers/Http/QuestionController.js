@@ -348,6 +348,7 @@ class QuestionController {
 
             // reset answer status
             post.status = 0;
+            await post.save(trx);
 
             if (url_params.id) {
                 // get choosen answer post
@@ -356,13 +357,16 @@ class QuestionController {
                 if (!choosen_post)
                     throw new Error("choosen id not found");
 
-                choosen_post.status = 1;
+                let status = 1;
+                if (choosen_post.status == 1)
+                    status = 0;
+
+                choosen_post.status = status;
                 await choosen_post.save(trx);
 
-                post.status = 1;
+                post.status = status;
+                await post.save(trx);
             }
-
-            await post.save(trx);
 
             trx.commit();
         } catch(e) {

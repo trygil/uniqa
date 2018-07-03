@@ -22,7 +22,7 @@
                     <!-- User-->
                     <v-flex lg6 offset-xs6 text-xs-center pa-3>
                         <v-btn 
-                            v-if="!data.posts && data.user_id == user.id" 
+                            v-if="!data.posts && posterid == user.id" 
                             title="choose as an answer"
                             @click="$emit('choosen', data)" 
                             icon>
@@ -74,7 +74,7 @@
 
     export default {
         name: 'Post',
-        props: { data: Object },
+        props: { data: Object, posterid: Number },
         computed: {
             user() {
                 return this.$store.state.auth.user;
