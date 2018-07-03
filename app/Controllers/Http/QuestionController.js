@@ -2,6 +2,7 @@
 
 const Database = use('Database')
 const Post = use('App/Models/Post')
+const Report = use('App/Models/Report')
 const Tag = use('App/Models/Tag')
 const _ = use('lodash')
 
@@ -11,7 +12,6 @@ let cte = `
         SELECT 
             0 AS answer_count, 
             p.upvote AS total_votes,
-            up.id, 
             up.username,
             p.* 
         FROM posts AS p
@@ -25,7 +25,6 @@ let cte = `
         SELECT 
             COUNT(a.*) AS answer_count, 
             SUM(a.upvote) + p.upvote AS total_votes, 
-            up.id, 
             up.username,
             p.* 
         FROM posts AS p
@@ -58,14 +57,19 @@ let cte = `
     ) `;
 
 class QuestionController {
-    async top({ request }) {
+    async top({ request, auth }) {
         const params = request.all();
+        const user = await auth.getUser();
+        var user_id = user.id || 0;
 
-        let sql = `SELECT * FROM top_post AS p `;
+        let sql = `SELECT p.*, r.reason AS reported FROM top_post AS p 
+                   LEFT JOIN reports AS r ON 
+                        r.post_id = p.id AND
+                        r.user_id = ? `;
 
         let page = params.page || 1;
         let perpage = params.perpage || 5;
-        let bindings = [];
+        let bindings = [user_id];
 
         if (params.tags) {
             sql += `WHERE lower(data->>'tags')::jsonb @> ?`;
@@ -76,7 +80,13 @@ class QuestionController {
         bindings.push(page * perpage);
         bindings.push(perpage * (page - 1));
 
-        let res = await Database.raw(cte + sql, bindings);
+        let res = [];
+
+        try {
+            res = await Database.raw(cte + sql, bindings);
+        } catch(e) {
+            console.error(e);
+        }
 
         return res.rows;
     }
@@ -327,8 +337,6 @@ class QuestionController {
                             .where("user_id", user.id)
                             .first();
 
-        console.log(post)
-
         try {
             if (!post)
                 throw new Error("post not found");
@@ -365,6 +373,45 @@ class QuestionController {
         }
 
         return response.send(post.status);
+    }
+
+    async postReport({request, response, auth}) {
+        const params = request.all();
+
+        // start transaction
+        const trx = await Database.beginTransaction()
+        let report = new Report;
+
+        try {
+            const user = await auth.getUser();
+
+            if (!user)
+                throw new Error("not authorized");
+
+            // get question post
+            const post = await Post.find(params.post_id);
+
+            if (!post)
+                throw new Error("post not found");
+
+            report.fill({
+                post_id: post.id,
+                user_id: user.id,
+                reason: params.reason,
+            });
+
+            // save the report
+            await report.save(trx);
+
+            trx.commit();
+        } catch(e) {
+            trx.rollback();
+            console.error(e);
+
+            return response.status(500).send("report failed");
+        }
+
+        return response.status(200).send("report saved");
     }
 
     async deleteQuestion({params, request, response, auth}) {

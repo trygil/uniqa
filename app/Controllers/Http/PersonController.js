@@ -10,11 +10,10 @@ class PersonController {
     async data({request}) {
         const params = request.all();
         let query = Database.table('admin.persons as p');
+        let subsql = '(SELECT person_id FROM admin.invitations GROUP BY person_id) as i';
 
-        query.leftJoin(
-            Database.raw('(SELECT person_id FROM admin.invitations GROUP BY person_id) as i'),
-            'i.person_id', '=', 'p.id'
-        );
+        query.leftJoin(Database.raw(subsql), 'i.person_id', '=', 'p.id')
+            .leftJoin("public.users as up", "up.email", "=", "p.email");
 
         let sortby = ['p.' + params.sortby];
         if (params.sortby == 'full_name')
@@ -30,7 +29,9 @@ class PersonController {
             'p.last_name',
             'p.email',
             'p.data',
-            Database.raw('i.person_id IS NOT NULL as invited')
+            Database.raw('up.id IS NOT NULL as registered'),
+            Database.raw('COALESCE(up.type, 0) as user_type'),
+            Database.raw('i.person_id IS NOT NULL as invited'),
         ]);
 
         if (params.search)
@@ -39,8 +40,26 @@ class PersonController {
                 p.email ILIKE ?`, [params.search + '%', params.search + '%']
             );
 
+        // uninvited
+        if (params.filter == 1)
+            query.whereRaw("i.person_id IS NULL AND up.id IS NULL");
 
-        let persons = await query.paginate(params.page, params.perpage);
+        // invited
+        if (params.filter == 2)
+            query.whereRaw("i.person_id IS NOT NULL AND up.id IS NULL");
+
+        // registered
+        if (params.filter == 4)
+            query.whereRaw("up.id IS NOT NULL");
+
+
+        let persons = [];
+
+        try {
+            persons = await query.paginate(params.page, params.perpage);
+        } catch(e) {
+            console.error(e);
+        }
 
         return persons
     }
@@ -130,16 +149,30 @@ class PersonController {
     }
 
     async cancel({request}) {
-        const Encryption = use('Encryption')
-        const Env = use('Env')
+        const Encryption = use('Encryption');
+        const Env = use('Env');
 
-        const reqParam = request.all()
-        const trx = await Database.beginTransaction()
+        const reqParam = request.all();
+        const trx = await Database.beginTransaction();
 
-        // delete old invitation(s)
-        await Invitation.query().where('person_id', reqParam.id).delete(trx)
+        try {
+            // delete old invitation(s)
+            // await Invitation.query().where('person_id', reqParam.id).delete(trx)
 
-        trx.commit()
+            // get person data
+            let person = await Person.find(reqParam.id);
+            if (person) {
+                let user = await User.query().where('email', person.email).first();
+
+                // delete user associated with this 'person'
+                if (user) user.delete(trx);
+            }
+
+            trx.commit();
+        } catch(e) {
+            trx.rollback();
+            console.error(e);
+        }
 
         return 'Invitation canceled'
     }
@@ -163,7 +196,7 @@ class PersonController {
 
     async edit({request, response}) {
         const params = request.all().person;
-        const trx = await Database.beginTransaction()
+        const trx = await Database.beginTransaction();
 
         let person = await Person.find(params.id)
 
@@ -185,14 +218,27 @@ class PersonController {
         const id = request.all().id;
         const trx = await Database.beginTransaction()
 
-        let person = await Person.find(id)
+        try {
+            let person = await Person.find(id)
 
-        if (!person)
-            return response.status(404).send('Not found!')
+            if (!person)
+                return response.status(404).send('Not found!')
 
-        await person.delete(trx);
+            let user = await User.query().where('email', person.email).first();
 
-        trx.commit()
+            // delete user associated with this 'person'
+            if (user) user.delete(trx);
+
+            // delete person
+            await person.delete(trx);
+
+            trx.commit();
+        } catch(e) {
+            trx.rollback();
+            console.error(e);
+
+            return response.status(500).send("something wrong! i don't know why")
+        }
 
         return 'Data deleted';
     }

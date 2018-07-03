@@ -10,6 +10,10 @@ import {
     Message,
     Alert,
     Notification,
+    Dialog,
+    Radio,
+    RadioGroup,
+    MessageBox,
 } from 'element-ui'
 import axios from 'axios'
 import el_locale from 'element-ui/lib/locale/lang/en'
@@ -28,6 +32,9 @@ Vue.use(Input)
 Vue.use(FormItem)
 Vue.use(Button)
 Vue.use(Alert)
+Vue.use(Dialog)
+Vue.use(Radio)
+Vue.use(RadioGroup)
 
 moment.locale('id');
 
@@ -36,6 +43,7 @@ Vue.prototype.$notify = Notification;
 Vue.prototype.$ELEMENT = {locale: el_locale};
 Vue.http = Vue.prototype.$http = axios;
 Vue.prototype.$moment = moment;
+Vue.prototype.$confirm = MessageBox.confirm;
 
 // check login token
 store.dispatch("checkLoginToken");

@@ -29,6 +29,7 @@ Route.group(() => {
     Route.post('/question/answer', 'QuestionController.postAnswer').middleware(['auth'])
     Route.post('/question/upvote/:id', 'QuestionController.postUpvote').middleware(['auth'])
     Route.post('/question/choose/:id', 'QuestionController.postChoose').middleware(['auth'])
+    Route.post('/question/report', 'QuestionController.postReport').middleware(['auth'])
     Route.delete('/question/:id', 'QuestionController.deleteQuestion').middleware(['auth'])
     Route.get('/api/question/recent', 'QuestionController.recent')
     Route.get('/api/question/top', 'QuestionController.top')
@@ -55,6 +56,9 @@ Route.group(() => {
     Route.get('/admin/profile', 'AdminController.getProfile').middleware(['admin_auth'])
     Route.post('/admin/profile', 'AdminController.updateProfile').middleware(['admin_auth'])
     Route.post('/admin/change-password', 'AdminController.changePassword').middleware(['admin_auth'])
+
+    Route.get('/reports', 'PostController.getPostReports').middleware(['admin_auth'])
+    Route.delete('/post/:id', 'PostController.deletePost').middleware(['admin_auth'])
 
     // SPA route
     Route.any('*', ({ view, auth }) => view

@@ -6,7 +6,6 @@ class Tag extends Model {
     static get primaryKey () {
         return 'tag'
     }
-
 }
 
 module.exports = Tag

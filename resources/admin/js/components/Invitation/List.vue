@@ -6,7 +6,20 @@
                 <v-icon>person_add</v-icon>
                 {{ $t('action.add') }}
             </v-btn>
+
             <v-spacer></v-spacer>
+
+            <v-select
+                :items="filters"
+                class="mt-4 mr-3"
+                v-model="filter"
+                label="Filter"
+                item-text="label"
+                item-value="value"
+                return-object
+                clearable>
+            </v-select>
+
             <v-text-field
                 append-icon="search"
                 label="Cari.."
@@ -82,13 +95,13 @@
                     </v-tooltip>
                     <!-- user not invited -->
 
-                    <!-- user invited -->
-                    <v-tooltip bottom v-show="item.invited">
+                    <!-- user invited not registered -->
+                    <v-tooltip bottom v-show="item.invited && !item.registered">
                         <v-icon slot="activator">done</v-icon>
                         <span>Undangan terkirim.</span>
                     </v-tooltip>
 
-                    <v-tooltip bottom v-show="item.invited">
+                    <v-tooltip bottom v-show="item.invited && !item.registered">
                         <v-btn 
                             small 
                             icon 
@@ -100,7 +113,27 @@
                         </v-btn>
                         <span>Batalkan undangan</span>
                     </v-tooltip>
-                    <!-- user invited -->
+                    <!-- user invited not registered -->
+
+                    <!-- user invited registered -->
+                    <!-- <v-tooltip bottom v-show="item.invited && item.registered">
+                        <v-icon slot="activator">assignment_ind</v-icon>
+                        <span>Jadikan moderator</span>
+                    </v-tooltip>
+
+                    <v-tooltip bottom v-show="item.invited && item.registered">
+                        <v-btn 
+                            small 
+                            icon 
+                            slot="activator" 
+                            @click="block(item)" 
+                            :loading="item.blocking"
+                            :disabled="item.blocking">
+                            <v-icon color="error">block</v-icon>
+                        </v-btn>
+                        <span>Blok pengguna</span>
+                    </v-tooltip> -->
+                    <!-- user invited registered -->
                 </td>
             </template>
             <v-alert slot="no-results" :value="true" color="error" icon="warning">
@@ -139,7 +172,7 @@
 </template>
 
 <script>
-import Vue from "vue";
+import _ from "lodash";
 
 let search_timer = null;
 
@@ -153,6 +186,15 @@ export default {
                 { text: '#', value: null, sortable: false, width: "10%" },
             ],
             items: [],
+            filter: null,
+            filters: [
+                // uninvited
+                { value: 1, label: "Belum diundang" },
+                // invited
+                { value: 2, label: "Telah diundang" },
+                // registered
+                { value: 4, label: "Telah menjadi user" },
+            ],
             search: "",
             pagination: {},
             totalItems: 0,
@@ -178,7 +220,10 @@ export default {
             if (this.search)
                 params.search = this.search;
 
-            return Vue.http("/person/data", {params})
+            if (this.filter)
+                params.filter = this.filter.value;
+
+            return this.$http("/person/data", {params})
                 .then((res) => {
                     let response = res.data;
 
@@ -195,7 +240,7 @@ export default {
             let vm = this;
             this.$set(person, "inviting", true);
 
-            Vue.http
+            this.$http
                 .post("/invitation/invite", {id: person.id})
                 .then(
                     () => {
@@ -215,7 +260,7 @@ export default {
             let vm = this;
             this.$set(person, "canceling", true);
 
-            Vue.http
+            this.$http
                 .post("/invitation/cancel", {id: person.id})
                 .then(
                     () => {
@@ -242,7 +287,7 @@ export default {
         save() {
             const vm = this;
 
-            Vue.http
+            this.$http
                 .post("/person/add", {person: this.form})
                 .then(
                     () => {
@@ -262,7 +307,7 @@ export default {
             const vm = this;
             this.$set(person, "editing", true);
 
-            Vue.http
+            this.$http
                 .post("/person/edit", {person: person})
                 .then(
                     () => {
@@ -285,7 +330,7 @@ export default {
                 type: 'warning'
             }).then(() => {
                 this.$set(person, "deleting", true);
-                Vue.http
+                this.$http
                     .get("/person/delete", {params: {id: person.id}})
                     .then(
                         () => {
@@ -318,6 +363,9 @@ export default {
             search_timer = setTimeout(() => {
                 vm.loadData();
             }, 500);
+        },
+        filter() {
+            this.loadData();
         },
     },
 };

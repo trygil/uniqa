@@ -8,11 +8,19 @@ class AlterPostUpvotesAddValSchema extends Schema {
       // alter table
       table.integer('val').default(0);
 
-      table.foreign('post_id')
+      table.dropForeign('post_id');
+      table.integer('post_id')
+        .alter()
+        .references('id')
+        .inTable('posts')
         .onUpdate('cascade')
         .onDelete('cascade');
 
-      table.foreign('user_id')
+      table.dropForeign('user_id');
+      table.integer('user_id')
+        .alter()
+        .references('id')
+        .inTable('users')
         .onUpdate('cascade')
         .onDelete('cascade');
 
