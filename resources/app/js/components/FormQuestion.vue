@@ -23,6 +23,10 @@
                             <v-select
                                 v-model="form.tags"
                                 :label="$t('question.labels.tags')"
+                                :search-input.sync="tag_search"
+                                :items="tags"
+                                autocomplete
+                                cache-items
                                 chips
                                 tags></v-select>
                         </v-flex>
@@ -38,11 +42,16 @@
 </template>
 
 <script>
+let search_timer = null;
+
 export default {
     name: "QuestionForm",
     data() {
         return {
             form: {},
+            tag_search: {},
+            tag_loading: false,
+            tags: [],
         };
     },
     methods: {
@@ -60,6 +69,34 @@ export default {
                 .catch((err) => {
                     this.$message.error(this.$t("question.messages.save_failed"));
                 });
+        },
+        searchTag(query) {
+            this.tag_loading = true;
+
+            let vm = this;
+            if (search_timer)
+                clearTimeout(search_timer);
+
+            let params = {
+                search: query,
+            };
+
+            search_timer = setTimeout(async () => {
+                this.$http.get("/api/tag", { params })
+                    .then((res) => {
+                        vm.tags = res.data.tags.map((item) => item.tag);
+                        vm.tag_loading = false;
+                    })
+                    .catch((e) => {
+                        console.log(e)
+                        vm.tag_loading = false;
+                    });
+            }, 500);
+        },
+    },
+    watch: {
+        tag_search(val) {
+            this.searchTag(val);
         },
     },
 };
