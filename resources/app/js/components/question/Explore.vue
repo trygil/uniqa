@@ -4,20 +4,44 @@
             <v-layout fill-height>
                 <v-list class="grow grey lighten-4">
                     <v-list-tile
-                        v-for="(label, link) in links"
+                        v-for="(item, link) in links"
                         :key="link"
                         :to="link">
-                        <v-list-tile-title v-text="label"></v-list-tile-title>
+                        <v-list-tile-action>
+                            <v-icon>{{ item.icon }}</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content v-text="item.label"></v-list-tile-content>
                     </v-list-tile>
                 </v-list>
             </v-layout>
         </v-flex>
-        <v-flex md6>
+        <v-flex md6 sm12>
             <List :data="data" @refresh-list="loadQuestions()" />
-
-            <!-- <div class="text-xs-center mt-5" v-if="pagination.lastPage > 1">
-                <v-pagination :length="pagination.lastPage" v-model="pagination.page" @input="loadQuestions" />
-            </div> -->
+        </v-flex>
+        <v-flex md3 xs12>
+            <v-form @submit.prevent="">
+                <div class="headline">
+                    <v-icon>search</v-icon> 
+                    {{ $t('question.labels.search') }}
+                </div>
+                <v-flex lg12>
+                    <v-text-field
+                        v-model="search.query"
+                        :placeholder="$t('question.labels.search_query')">
+                    </v-text-field>
+                    <v-flex lg12>
+                        <v-select
+                            v-model="search.tags"
+                            :label="$t('question.labels.search_tags')"
+                            :search-input.sync="tag_search"
+                            :items="tags"
+                            autocomplete
+                            cache-items
+                            chips
+                            tags></v-select>
+                    </v-flex>
+                </v-flex>
+            </v-form>
         </v-flex>
     </v-layout>
 </template>
@@ -25,6 +49,9 @@
 <script>
     import Vue from "vue";
     import List from "./List";
+
+    let search_timer = null;
+    let tag_search_timer = null;
 
     export default {
         name: "Explore",
@@ -35,11 +62,20 @@
                 pagination: {},
                 data: [],
                 links: {
-                    "/questions/top": this.$t("question.menu.top_question"),
-                    "/questions/recent": this.$t("question.menu.recent_question"),
-                    "/questions/mostfollowed": this.$t("question.menu.most_followed_question"),
+                    "/questions/top": {
+                        label: this.$t("question.menu.top_question"),
+                        icon: "thumb_up",
+                    },
+                    "/questions/recent": {
+                        label: this.$t("question.menu.recent_question"),
+                        icon: "watch_later",
+                    },
                 },
-            }
+                search: {query: null, tags: []},
+                tag_search: {},
+                tag_loading: false,
+                tags: [],
+            };
         },
         mounted() {
             this.loadQuestions();
@@ -51,17 +87,39 @@
                     // re-load questions
                     this.loadQuestions()
                 },
+            },
+            tag_search(val) {
+                this.searchTag(val);
+            },
+            search: {
+                deep: true,
+                handler(val) {
+                    let vm = this;
+                    if (search_timer)
+                        clearTimeout(search_timer);
+
+                    search_timer = setTimeout(() => {
+                        vm.loadQuestions(); // process search
+                    }, 500);
+                }
             }
         },
         methods: {
             loadQuestions(page) {
                 this.loading = true;
 
+                if (this.search.query)
+                    this.$route.query.query = this.search.query;
+
+                if (this.search.tags)
+                    this.$route.query.tags = this.search.tags;
+
                 const route_params = this.$route.params;
                 const params = {
                     perpage: 10,
                     page: page || 1,
                     tags: this.$route.query.tags,
+                    search: this.search.query,
                 };
 
                 let type = route_params.type || "recent";
@@ -70,16 +128,33 @@
                     .then((res) => {
                         this.loading = false;
                         this.data = res.data;
-                        /*this.pagination = {
-                            total: parseInt(response.total),
-                            perPage: parseInt(response.perPage),
-                            page: parseInt(response.page),
-                            lastPage: parseInt(response.lastPage),
-                        };*/
                     })
                     .catch(() => {
                         this.loading = false;
                     });
+            },
+            searchTag(query) {
+                this.tag_loading = true;
+
+                let vm = this;
+                if (tag_search_timer)
+                    clearTimeout(tag_search_timer);
+
+                let params = {
+                    search: query,
+                };
+
+                tag_search_timer = setTimeout(async () => {
+                    this.$http.get("/api/tag", { params })
+                        .then((res) => {
+                            vm.tags = res.data.tags.map((item) => item.tag);
+                            vm.tag_loading = false;
+                        })
+                        .catch((e) => {
+                            console.log(e)
+                            vm.tag_loading = false;
+                        });
+                }, 500);
             },
         },
     }

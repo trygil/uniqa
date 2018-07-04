@@ -14,6 +14,9 @@ export default {
             tags: "Tambah tag untuk pertanyaan anda",
             submit: "Tanyakan!",
             submit_answer: "Jawab",
+            search: "Cari Pertanyaan",
+            search_query: "cari judul atau dekripsi pertanyaan",
+            search_tags: "cari dengan tag",
             delete_confirmation: "Post akan terhapus secara permanen. Yakin?",
         },
         messages: {
@@ -41,6 +44,9 @@ export default {
             tags: "Give the question some tags..",
             submit: "Ask question!",
             submit_answer: "Answer",
+            search: "Search Question",
+            search_query: "search by question title or description",
+            search_tags: "search by tag",
             delete_confirmation: "Your post will be deleted permanently. Are you sure?",
         },
         messages: {

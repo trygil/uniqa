@@ -1,12 +1,12 @@
 <template>
 <v-app id="inspire">
-    <v-toolbar color="blue-grey lighten-5" app fixed clipped-left>
+    <v-toolbar color="teal" dark app fixed clipped-left>
         <!-- <v-toolbar-side-icon @click.native="drawer = !drawer"></v-toolbar-side-icon> -->
         <router-link to="/" class="title ml-3 mr-5">
             <v-avatar tile :size="50">
                 <img src="/uniqamente.png" alt="avatar" />
             </v-avatar>
-            <span class="text black--text">UNIQA</span>
+            <span class="text white--text">UNIQA</span>
         </router-link>
 
         <v-toolbar-items>

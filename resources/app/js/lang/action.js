@@ -10,6 +10,7 @@ export default {
         "done":       "Selesai",
         "report":     "Laporkan",
         "sure":       "Ya",
+        "search":     "Cari",
         "more":       "selengkapnya",
     },
     en: {
@@ -23,6 +24,7 @@ export default {
         "done":       "Done",
         "report":     "Report",
         "sure":       "Sure",
+        "search":     "Search",
         "more":       "more",
     },
 }
