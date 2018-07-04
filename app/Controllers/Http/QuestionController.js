@@ -71,9 +71,19 @@ class QuestionController {
         let perpage = params.perpage || 5;
         let bindings = [user_id];
 
+        sql += `WHERE 1=1 `;
+
         if (params.tags) {
-            sql += `WHERE lower(data->>'tags')::jsonb @> ?`;
-            bindings.push('["' + params.tags.toLowerCase() + '"]');
+            sql += `AND lower(data->>'tags')::jsonb @> ? `;
+            bindings.push('[' + params.tags.map((item) => { 
+                return '"' + item.toLowerCase() + '"';
+            }).join(",") + ']');
+        }
+
+        if (params.search) {
+            sql += `AND (p.title ILIKE ? OR p.post ILIKE ?) `;
+            bindings.push("%" + params.search + "%");
+            bindings.push("%" + params.search + "%");
         }
 
         sql += `LIMIT ? OFFSET ?`;
@@ -103,7 +113,9 @@ class QuestionController {
 
         if (params.tags) {
             sql += `WHERE lower(data->>'tags')::jsonb @> ?`;
-            bindings.push('["' + params.tags.toLowerCase() + '"]');
+            bindings.push('[' + params.tags.map((item) => { 
+                return '"' + item.toLowerCase() + '"';
+            }).join(",") + ']');
         }
 
         // set limit & offset

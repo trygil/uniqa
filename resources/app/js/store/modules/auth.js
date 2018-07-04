@@ -69,6 +69,8 @@ const actions = {
                 commit('SET_USER', payload.data);
                 commit('SET_TOKEN', token);
                 commit('SET_REFRESH_TOKEN', refresh_token);
+
+                Vue.http.defaults.headers.common['Authorization'] = 'Bearer ' + token;
             });
 
         return response;
@@ -81,6 +83,8 @@ const actions = {
         localStorage.removeItem("auth");
         localStorage.removeItem("auth_token");
         localStorage.removeItem("auth_refresh_token");
+
+        Vue.http.defaults.headers.common['Authorization'] = 'Bearer -';
     },
 };
 
