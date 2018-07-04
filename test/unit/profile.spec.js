@@ -16,7 +16,7 @@ test('make sure data profile is accessible', async ({ assert, client }) => {
 
     res.assertStatus(200)
     res.assertHeader('content-type', 'application/json; charset=utf-8')
-})
+}).timeout(0)
 
 test('profile should be updated', async ({ assert, client }) => {
     const user = await User.find(1)
@@ -26,7 +26,7 @@ test('profile should be updated', async ({ assert, client }) => {
         .end()
 
     res.assertStatus(200)
-})
+}).timeout(0)
 
 test('profile password should be updated', async ({ assert, client }) => {
     const user = await User.find(1)
@@ -36,4 +36,4 @@ test('profile password should be updated', async ({ assert, client }) => {
         .end()
 
     res.assertStatus(200)
-})
+}).timeout(0)
