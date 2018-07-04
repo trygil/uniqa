@@ -1,5 +1,5 @@
 <template>
-<div>
+<div id="login-panel">
     <v-flex lg12>
         <v-card>
             <v-card-title>

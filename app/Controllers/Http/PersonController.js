@@ -52,7 +52,6 @@ class PersonController {
         if (params.filter == 4)
             query.whereRaw("up.id IS NOT NULL");
 
-
         let persons = [];
 
         try {

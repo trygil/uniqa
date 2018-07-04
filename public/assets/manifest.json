@@ -1,15 +1,15 @@
 {
-  "admin_application.js": "admin_application.js",
-  "admin_application_style.js": "admin_application_style.js",
-  "admin_application_style.css": "admin_application_style.css",
-  "admin_login.js": "admin_login.js",
-  "admin_login_style.js": "admin_login_style.js",
-  "admin_login_style.css": "admin_login_style.css",
-  "app_application.js": "app_application.js",
   "app_application_style.js": "app_application_style.js",
   "app_application_style.css": "app_application_style.css",
-  "app_login.js": "app_login.js",
+  "app_application.js": "app_application.js",
   "app_login_style.js": "app_login_style.js",
   "app_login_style.css": "app_login_style.css",
+  "app_login.js": "app_login.js",
+  "admin_login_style.js": "admin_login_style.js",
+  "admin_login_style.css": "admin_login_style.css",
+  "admin_login.js": "admin_login.js",
+  "admin_application_style.js": "admin_application_style.js",
+  "admin_application_style.css": "admin_application_style.css",
+  "admin_application.js": "admin_application.js",
   "element-icons.ttf": "6f0a76321d30f3c8120915e57f7bd77e.ttf"
 }
