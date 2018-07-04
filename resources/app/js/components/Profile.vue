@@ -4,31 +4,80 @@
             <v-layout row wrap>
                 <v-flex xs12 sm4>
                     <v-card>
+                        <!-- <v-card-media>
+                            <v-layout row>
+                                <v-flex xs8>
+                                    <v-avatar
+                                        size="200px"
+                                    >
+                                        <img
+                                            src="/images/me.jpg"
+                                            alt="sandman"
+                                        >
+                                    </v-avatar>
+                                </v-flex>
+                            </v-layout>
+                        </v-card-media> -->
                         <!-- profile pict -->
-                        <v-card-media
+                        <!-- <v-card-media
                         src="#"
                         height="200px"
                         >
-                        Profile Pict goes here ...
-                        </v-card-media>
+                            <v-avatar>
+                                <img
+                                    src="/images/me.jpg"
+                                    alt="sandman"
+                                >
+                            </v-avatar>
+                        </v-card-media> -->
 
                         <!-- title -->
                         <v-card-title primary-title>
-                            <v-layout row>
-                                <v-flex xs8>
-                                    <h1>Sandman Hakim</h1>
-                                    <p>sandman-hakim@live.com</p>
+                            <v-layout row align-center>
+                                <v-flex xs6>
+                                    <v-layout
+                                        align-center
+                                        justify-space-around
+                                        wrap
+                                    >
+                                        <v-avatar
+                                            size="200px"
+                                        >
+                                            <img
+                                                src="/images/me.jpg"
+                                                alt="sandman"
+                                            >
+
+                                            <v-btn
+                                                dark
+                                                fab
+                                                absolute
+                                                right
+                                                bottom
+                                                color="cyan"
+                                                @click="onUpload"
+                                            >
+                                                <v-icon>camera</v-icon>
+                                            </v-btn>
+                                        </v-avatar>
+
+                                    </v-layout>
+
                                 </v-flex>
 
-                                <v-flex xs4>
-                                    <h1 class="text-lg-right">1,115,999</h1>
-                                    <p class="text-lg-right">Reputation</p>
+                                <v-flex xs6>
+                                    <br>
+                                    <h1>Sandman Hakim</h1>
+                                    <p>sandman-hakim@live.com</p>
+                                    <br>
+                                    <h2>1,115,999</h2>
+                                    <p>Reputation</p>
                                 </v-flex>
                             </v-layout>
                         </v-card-title>
 
                         <!-- tagline -->
-                        <h3 class="text-sm-center">Talk is cheap, show me your code !</h3>
+                        <br><br><h3 class="text-sm-center">Talk is cheap, show me your code !</h3>
 
                         <v-card-actions>
                             <v-spacer></v-spacer>
@@ -133,6 +182,6 @@ export default {
     name: "Profile",
     data: () => ({
       show: false,
-    })
+    }),
 }
 </script>

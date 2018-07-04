@@ -35,7 +35,7 @@ let routes = [
         path: '/settings',
     },
     {
-        path: '/profile',
+        path: '/user/:id',
         component: require('../components/Profile').default,
     },
 ];

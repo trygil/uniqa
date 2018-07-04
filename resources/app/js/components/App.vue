@@ -51,7 +51,7 @@
                 <v-list dense>
                     <v-divider></v-divider>
                     <div>
-                        <a href="/profile" @click.prevent="profile" class="list__tile list__tile--link" style="position: relative;">
+                        <a href="/user/:id" @click.prevent="profile" class="list__tile list__tile--link" style="position: relative;">
                             <div class="list__tile__title text-md-center subheading"> profile </div>
                         </a>
                     </div>
@@ -94,7 +94,7 @@ export default {
         },
 
         profile() {
-            this.$router.push("/profile")
+            this.$router.push("user/")
         },
     },
     computed: {
