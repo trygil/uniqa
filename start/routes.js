@@ -36,6 +36,8 @@ Route.group(() => {
     Route.get('/api/question/:id', 'QuestionController.retrieve')
     Route.get('/api/tag', 'TagController.tagList')
 
+    Route.get('/api/user/:id', 'PersonController.user')
+
     // SPA route
     Route.any('*', ({ view, auth }) => view.render('uniqamente'));
 }).domain('uni.qa')

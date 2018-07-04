@@ -242,6 +242,11 @@ class PersonController {
 
         return 'Data deleted';
     }
+
+    async user({params, response}) {
+        let user = await User.find(params.id);
+        return user
+    }
 }
 
 module.exports = PersonController

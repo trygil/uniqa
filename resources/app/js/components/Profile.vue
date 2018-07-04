@@ -4,34 +4,6 @@
             <v-layout row wrap>
                 <v-flex xs12 sm4>
                     <v-card>
-                        <!-- <v-card-media>
-                            <v-layout row>
-                                <v-flex xs8>
-                                    <v-avatar
-                                        size="200px"
-                                    >
-                                        <img
-                                            src="/images/me.jpg"
-                                            alt="sandman"
-                                        >
-                                    </v-avatar>
-                                </v-flex>
-                            </v-layout>
-                        </v-card-media> -->
-                        <!-- profile pict -->
-                        <!-- <v-card-media
-                        src="#"
-                        height="200px"
-                        >
-                            <v-avatar>
-                                <img
-                                    src="/images/me.jpg"
-                                    alt="sandman"
-                                >
-                            </v-avatar>
-                        </v-card-media> -->
-
-                        <!-- title -->
                         <v-card-title primary-title>
                             <v-layout row align-center>
                                 <v-flex xs6>
@@ -77,7 +49,7 @@
                         </v-card-title>
 
                         <!-- tagline -->
-                        <br><br><h3 class="text-sm-center">Talk is cheap, show me your code !</h3>
+                        <br><br><h3 class="text-sm-center">Talk is cheap, show me your code !</h3><br><br>
 
                         <v-card-actions>
                             <v-spacer></v-spacer>
@@ -183,5 +155,10 @@ export default {
     data: () => ({
       show: false,
     }),
+    computed: {
+        user() {
+            return this.$store.state.auth.user;
+        },
+    }
 }
 </script>
