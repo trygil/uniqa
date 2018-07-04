@@ -52,10 +52,17 @@
                         <v-card-title>
                             <v-spacer></v-spacer>
 
-                            <v-avatar size="36px" class="mr-2 teal">
-                                {{ (item.username || "").substr(0, 1) }}
-                            </v-avatar>
-                            <router-link :to="'/user/' + item.user_id">{{ item.username }}</router-link>
+                            <v-flex class="lg3">
+                                <v-avatar size="36px" class="mr-2 teal">
+                                    {{ (item.username || "").substr(0, 1) }}
+                                </v-avatar>
+                                <router-link :to="'/user/' + item.user_id">{{ item.username }}</router-link>
+
+                                <span class="caption ml-5 mt-2">
+                                    {{ $moment(item.created_at).fromNow() }}
+                                </span>
+                            </v-flex>
+
                         </v-card-title>
                     </v-card>
                 </v-flex>

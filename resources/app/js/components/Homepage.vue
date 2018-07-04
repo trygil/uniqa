@@ -4,10 +4,13 @@
             <v-layout fill-height>
                 <v-list class="grow grey lighten-4">
                     <v-list-tile
-                        v-for="(label, link) in links"
+                        v-for="(item, link) in links"
                         :key="link"
                         :to="link">
-                        <v-list-tile-title v-text="label"></v-list-tile-title>
+                        <v-list-tile-action>
+                            <v-icon>{{ item.icon }}</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content v-text="item.label"></v-list-tile-content>
                     </v-list-tile>
                 </v-list>
             </v-layout>
@@ -34,9 +37,14 @@
                 loading: true,
                 data: [],
                 links: {
-                    "/questions/top": this.$t("question.menu.top_question"),
-                    "/questions/recent": this.$t("question.menu.recent_question"),
-                    "/questions/mostfollowed": this.$t("question.menu.most_followed_question"),
+                    "/questions/top": {
+                        label: this.$t("question.menu.top_question"),
+                        icon: "thumb_up",
+                    },
+                    "/questions/recent": {
+                        label: this.$t("question.menu.recent_question"),
+                        icon: "watch_later",
+                    },
                 },
             }
         },
