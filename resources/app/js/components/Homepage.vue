@@ -57,7 +57,7 @@
                 this.loading = true;
 
                 const params = {
-                    perpage: 5,
+                    perpage: 50,
                     page: page || 1,
                 };
 

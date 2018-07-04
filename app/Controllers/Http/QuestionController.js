@@ -59,19 +59,28 @@ let cte = `
 class QuestionController {
     async top({ request, auth }) {
         const params = request.all();
-        const user = await auth.getUser();
-        var user_id = user.id || 0;
+        let user = null;
+        let user_id = 0;
+
+        try {
+            await auth.check();
+
+            user = await auth.getUser();
+            user_id = user.id;
+        } catch (error) {
+            console.log("anonymous user");
+        }
+
 
         let sql = `SELECT p.*, r.reason AS reported FROM top_post AS p 
                    LEFT JOIN reports AS r ON 
                         r.post_id = p.id AND
-                        r.user_id = ? `;
+                        r.user_id = ? 
+                   WHERE 1=1 `;
 
         let page = params.page || 1;
         let perpage = params.perpage || 5;
         let bindings = [user_id];
-
-        sql += `WHERE 1=1 `;
 
         if (params.tags) {
             sql += `AND lower(data->>'tags')::jsonb @> ? `;
@@ -109,13 +118,19 @@ class QuestionController {
         let perpage = params.perpage || 5;
         let bindings = [];
 
-        let sql = `SELECT * FROM recent_post AS p `;
+        let sql = `SELECT * FROM recent_post AS p WHERE 1=1 `;
 
         if (params.tags) {
-            sql += `WHERE lower(data->>'tags')::jsonb @> ?`;
+            sql += `AND lower(data->>'tags')::jsonb @> ? `;
             bindings.push('[' + params.tags.map((item) => { 
                 return '"' + item.toLowerCase() + '"';
             }).join(",") + ']');
+        }
+
+        if (params.search) {
+            sql += `AND (p.title ILIKE ? OR p.post ILIKE ?) `;
+            bindings.push("%" + params.search + "%");
+            bindings.push("%" + params.search + "%");
         }
 
         // set limit & offset

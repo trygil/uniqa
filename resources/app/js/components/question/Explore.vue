@@ -111,16 +111,24 @@
                 if (this.search.query)
                     this.$route.query.query = this.search.query;
 
-                if (this.search.tags)
-                    this.$route.query.tags = this.search.tags;
+                let search_tags = [];
+                if (this.$route.query.tags)
+                    search_tags = [this.$route.query.tags];
+
+                if (this.search.tags.length > 0)
+                    search_tags = this.search.tags;
 
                 const route_params = this.$route.params;
-                const params = {
-                    perpage: 10,
+                let params = {
+                    perpage: 50,
                     page: page || 1,
-                    tags: this.$route.query.tags,
-                    search: this.search.query,
                 };
+
+                if (this.search.query)
+                    params.search = this.search.query;
+
+                if (search_tags.length > 0)
+                    params.tags = search_tags;
 
                 let type = route_params.type || "recent";
 
