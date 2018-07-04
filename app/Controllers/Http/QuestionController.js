@@ -217,6 +217,28 @@ class QuestionController {
         return question;
     }
 
+    async related({ params, response }) {
+        let sql = `
+            SELECT rp.id, rp.title
+            FROM posts p 
+                JOIN posts rp ON rp.data->'tags' \\?| ARRAY(SELECT jsonb_array_elements_text(p.data->'tags')) AND 
+                     p.id = :id AND 
+                     rp.id <> :id
+            ORDER BY rp.upvote DESC, rp.created_at DESC LIMIT :limit`;
+
+        let data = [];
+        try {
+            let response = await Database.raw(sql, {id: params.id, limit: 10});
+            data = response.rows;
+        } catch(e) {
+            console.error(e);
+
+            return response.status(500);
+        }
+
+        return response.send(data);
+    }
+
     async postQuestion({request, response, auth}) {
         const params = request.all();
         const user = await auth.getUser();

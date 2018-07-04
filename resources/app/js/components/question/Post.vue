@@ -40,7 +40,7 @@
                 </v-layout>
                 <v-layout row>
                     <!-- Tags -->
-                    <v-flex xs12 py-3>
+                    <v-flex xs12 py-3 v-if="data.data">
                         <template v-if="data.data !== null">
                             <router-link
                                 :to="'/questions/?tags=' + encodeURIComponent(tag)"

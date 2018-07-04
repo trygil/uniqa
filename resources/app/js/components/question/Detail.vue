@@ -6,7 +6,7 @@
 
                 <Post :data="data" />
 
-                <template v-if="data.posts.length > 0">
+                <template v-if="data.posts && data.posts.length > 0">
                     <h2 class="title mt-4">{{ data.posts.length }} Answers</h2>
 
                     <div v-for="item in data.posts">
@@ -36,8 +36,17 @@
             </div>
         </v-flex>
 
-        <v-flex sm4 class="pl-4">
+        <v-flex sm4 class="pl-4" v-show="related_posts.length > 0">
             <span class="title">Related</span>
+            <v-list class="grow pa-2 grey lighten-5">
+                <v-list-tile
+                    v-for="related in related_posts"
+                    :key="related.id">
+                    <router-link :to="'/question/' + related.id" class="blue--text">
+                        {{ related.title }}
+                    </router-link>
+                </v-list-tile>
+            </v-list>
         </v-flex>
     </v-layout>
 </template>
@@ -60,6 +69,7 @@
                     comments: [],
                     posts: [],
                 },
+                related_posts: [],
             }
         },
         computed: {
@@ -70,17 +80,31 @@
         mounted() {
             this.loadQuestions();
         },
+        watch: {
+            "$route.params.id": {
+                handler() {
+                    this.loadQuestions();
+                }
+            }
+        },
         methods: {
             loadQuestions() {
                 this.loading = true;
 
-                return Vue.http("/api/question/"+ this.$route.params.id)
+                this.related_posts = [];
+
+                this.$http("/api/question/"+ this.$route.params.id)
                     .then((res) => {
                         this.loading = false;
                         this.data = res.data;
                     })
                     .catch(() => {
                         this.loading = false;
+                    });
+
+                this.$http.get('/api/question/related/' + this.$route.params.id)
+                    .then((res) => {
+                        this.related_posts = res.data;
                     });
             },
             async answer() {

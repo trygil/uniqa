@@ -34,6 +34,7 @@ Route.group(() => {
     Route.get('/api/question/recent', 'QuestionController.recent')
     Route.get('/api/question/top', 'QuestionController.top')
     Route.get('/api/question/:id', 'QuestionController.retrieve')
+    Route.get('/api/question/related/:id', 'QuestionController.related')
     Route.get('/api/tag', 'TagController.tagList')
 
     // SPA route
