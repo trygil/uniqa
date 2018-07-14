@@ -20,6 +20,7 @@
                         <v-form @submit.prevent="answer">
                             <v-text-field
                                 v-model="form.post"
+                                autofocus
                                 :label="$t('question.labels.answer')"
                                 textarea></v-text-field>
                             <v-btn 

@@ -21,6 +21,15 @@
                                         {{ $t("action.more") }}
                                     </router-link>
                                 </p>
+                                <!-- Tags -->
+                                <template v-if="item.data !== null">
+                                    <router-link
+                                        :to="'/questions/?tags=' + encodeURIComponent(tag)"
+                                        class="pa-2 elevation-1 caption blue lighten-5"
+                                        v-for="tag in item.data.tags">
+                                        {{ tag }}
+                                    </router-link>
+                                </template>
                             </v-flex>
                             <v-spacer></v-spacer>
 
@@ -50,6 +59,26 @@
                         </v-layout>
 
                         <v-card-title>
+                            <v-flex offset-xs2>
+                                <v-btn round small outline 
+                                    class="mx-0"
+                                    color="primary"
+                                    @click="openAnswer(item)">
+                                    <v-icon>edit</v-icon> {{ $t('question.labels.submit_answer') }}
+                                </v-btn>
+                                <v-btn round small outline 
+                                    class="mx-0" 
+                                    color="grey darken-2" 
+                                    v-if="item.user_id != user.id"
+                                    :disabled="item.followed"
+                                    @click="follow(item)">
+                                    <v-icon>rss_feed</v-icon> 
+                                    {{ item.followed ? 
+                                        $t('question.labels.followed') : 
+                                        $t('question.labels.follow') }}
+                                </v-btn>
+                            </v-flex>
+
                             <v-spacer></v-spacer>
 
                             <v-flex class="lg3">
@@ -57,12 +86,11 @@
                                     {{ (item.username || "").substr(0, 1) }}
                                 </v-avatar>
                                 <router-link :to="'/user/' + item.user_id">{{ item.username }}</router-link>
-
+                                <br>
                                 <span class="caption ml-5 mt-2">
                                     {{ $moment(item.created_at).fromNow() }}
                                 </span>
                             </v-flex>
-
                         </v-card-title>
                     </v-card>
                 </v-flex>
@@ -105,6 +133,42 @@
                 </el-dialog>
             </v-layout>
         </template>
+
+        <v-dialog
+            v-model="answer_dialog"
+            fullscreen
+            hide-overlay
+            transition="dialog-bottom-transition"
+            scrollable>
+            <v-card tile>
+                <v-toolbar card dark color="success">
+                    <v-btn icon dark @click.native="answer_dialog = false;form = {}">
+                        <v-icon>close</v-icon>
+                    </v-btn>
+                    <v-toolbar-title>{{ $t('question.labels.answer_question') }}</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-toolbar-items>
+                        <v-btn dark flat @click.prevent="answer()">
+                            <v-icon>send</v-icon>
+                            {{ $t('question.labels.submit_answer') }}
+                        </v-btn>
+                    </v-toolbar-items>
+                </v-toolbar>
+                <v-card-text>
+                    <v-flex xs8 offset-xs2 v-if="form.post">
+                        <span class="title">{{ form.post.title }}</span>
+                        <p class="headline">{{ form.post.post }}</p>
+                        <v-text-field
+                            v-model="form.answer"
+                            rows="2"
+                            :label="$t('question.labels.answer')"
+                            textarea
+                            autofocus></v-text-field>
+                    </v-flex>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
+
     </div>
 </template>
 
@@ -127,6 +191,9 @@
                     "Commercial or spam", 
                     "Others",
                 ],
+                form: {},
+                answering: false,
+                answer_dialog: false,
             };
         },
         computed: {
@@ -176,9 +243,7 @@
                         // reset all
                         this.cancelReportPost()
                     });
-
             },
-
             async deletePost(post_id) {
                 this.$confirm(this.$t('question.labels.delete_confirmation'), 'Warning', {
                     confirmButtonText: this.$t('action.sure'),
@@ -196,6 +261,49 @@
                         });
                 });
             },
+            openAnswer(post) {
+                this.answer_dialog = true;
+                this.form.post = post;
+            },
+            async answer(post) {
+                if (!/[\w\d]+/.test(this.form.post))
+                    return;
+
+                this.answering = true;
+
+                let params = {
+                    post_id: this.form.post.id,
+                    title:   this.form.post.title,
+                    post:    this.form.answer,
+                    user_id: this.user.id,
+                };
+
+                let response = await this.$http.post("/question/answer", params)
+                    .then((res) => {
+                        this.answering = false;
+                        this.answer_dialog = false;
+                        this.form = {};
+                        this.$message.success(this.$t("question.messages.answer_success"));
+                    })
+                    .catch((err) => {
+                        this.$message.error(this.$t("question.messages.answer_failed"));
+                    });
+            },
+            async follow(post) {
+                let response = await this.$http.post("/question/follow/" + post.id)
+                    .then((res) => {
+                        post.followed = !!res.data;
+                    })
+                    .catch((err) => {
+                        this.$message.error(this.$t("question.messages.action_failed"));
+                    });
+            },
         },
+        watch: {
+            answer_dialog(val) {
+                // reset form value
+                if (!val) this.form = {};
+            },
+        }
     }
 </script>

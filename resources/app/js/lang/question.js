@@ -10,6 +10,7 @@ export default {
         labels: {
             question: "Apa yang mau anda tanyakan?",
             answer: "Tulis jawaban anda..",
+            answer_question: "Jawab Pertanyaan",
             description: "Beri deskripsi untuk pertanyaan anda",
             tags: "Tambah tag untuk pertanyaan anda",
             submit: "Tanyakan!",
@@ -17,7 +18,10 @@ export default {
             search: "Cari Pertanyaan",
             search_query: "cari judul atau dekripsi pertanyaan",
             search_tags: "cari dengan tag",
+            search_for: "Mencari: \"{query}\"",
             delete_confirmation: "Post akan terhapus secara permanen. Yakin?",
+            follow: "Follow",
+            followed: "Followed",
         },
         messages: {
             save_success: "Pertanyaan anda sudah diposting!",
@@ -40,6 +44,7 @@ export default {
         labels: {
             question: "What do you want to ask?",
             answer: "Write your answer..",
+            answer_question: "Answering Question",
             description: "Some description for your question..",
             tags: "Give the question some tags..",
             submit: "Ask question!",
@@ -47,7 +52,10 @@ export default {
             search: "Search Question",
             search_query: "search by question title or description",
             search_tags: "search by tag",
+            search_for: "Search for: \"{query}\"",
             delete_confirmation: "Your post will be deleted permanently. Are you sure?",
+            follow: "Follow",
+            followed: "Followed",
         },
         messages: {
             save_success: "Your question has been posted!",

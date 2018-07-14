@@ -30,6 +30,7 @@ Route.group(() => {
     Route.post('/question/upvote/:id', 'QuestionController.postUpvote').middleware(['auth'])
     Route.post('/question/choose/:id', 'QuestionController.postChoose').middleware(['auth'])
     Route.post('/question/report', 'QuestionController.postReport').middleware(['auth'])
+    Route.post('/question/follow/:id', 'QuestionController.postFollow').middleware(['auth'])
     Route.delete('/question/:id', 'QuestionController.deleteQuestion').middleware(['auth'])
     Route.get('/api/question/recent', 'QuestionController.recent')
     Route.get('/api/question/top', 'QuestionController.top')

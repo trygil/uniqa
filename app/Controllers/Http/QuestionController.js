@@ -41,17 +41,25 @@ let cte = `
     ),
 
     top_post AS (
-        SELECT * FROM joined_post AS t
+        SELECT t.*, (f.user_id IS NOT NULL) AS followed
+        FROM joined_post AS t
+        LEFT JOIN post_follows AS f ON 
+                       f.post_id = t.id AND
+                       f.user_id = ?
         ORDER BY 
             total_votes DESC, 
             answer_count DESC,
-            created_at DESC
+            t.created_at DESC
     ),
 
     recent_post AS (
-        SELECT * FROM joined_post AS t
+        SELECT t.*, (f.user_id IS NOT NULL) AS followed
+        FROM joined_post AS t
+        LEFT JOIN post_follows AS f ON 
+                       f.post_id = t.id AND
+                       f.user_id = ?
         ORDER BY 
-             created_at DESC,
+             t.created_at DESC,
              total_votes DESC, 
              answer_count DESC
     ) `;
@@ -71,16 +79,17 @@ class QuestionController {
             console.log("anonymous user");
         }
 
-
-        let sql = `SELECT p.*, r.reason AS reported FROM top_post AS p 
+        let sql = `SELECT p.*, r.reason AS reported
+                   FROM top_post AS p 
                    LEFT JOIN reports AS r ON 
                         r.post_id = p.id AND
                         r.user_id = ? 
                    WHERE 1=1 `;
 
+
         let page = params.page || 1;
         let perpage = params.perpage || 5;
-        let bindings = [user_id];
+        let bindings = [user_id, user_id, user_id];
 
         if (params.tags) {
             sql += `AND lower(data->>'tags')::jsonb @> ? `;
@@ -113,12 +122,25 @@ class QuestionController {
     async recent({ request }) {
         const params = request.all();
 
+        let user = null;
+        let user_id = 0;
+
+        try {
+            await auth.check();
+
+            user = await auth.getUser();
+            user_id = user.id;
+        } catch (error) {
+            console.log("anonymous user");
+        }
+
         // pagination params
         let page = params.page || 1;
         let perpage = params.perpage || 5;
-        let bindings = [];
+        let bindings = [user_id, user_id];
 
-        let sql = `SELECT * FROM recent_post AS p WHERE 1=1 `;
+        let sql = `SELECT p.* FROM recent_post AS p 
+                   WHERE 1=1 `;
 
         if (params.tags) {
             sql += `AND lower(data->>'tags')::jsonb @> ? `;
@@ -465,6 +487,57 @@ class QuestionController {
         }
 
         return response.status(200).send("report saved");
+    }
+
+    async postFollow({params, response, auth}) {
+        // start transaction
+        const trx = await Database.beginTransaction()
+        let report = new Report;
+        let following = false;
+
+        try {
+            const user = await auth.getUser();
+
+            if (!user)
+                throw new Error("not authorized");
+
+            // get question post
+            const post = await Post.find(params.id);
+
+            if (!post)
+                throw new Error("post not found");
+
+            // get total upvotes
+            let sql = "SELECT * FROM post_follows WHERE post_id = ? AND user_id = ?";
+            let response = await trx.raw(sql, [post.id, user.id]);
+
+            // if already exists, delete record. (unfollow)
+            if (response.rows.length > 0) {
+                sql = "DELETE FROM post_follows WHERE post_id = ? AND user_id = ?";
+                await trx.raw(sql, [post.id, user.id]);
+            }
+            // .. otherwise insert
+            else {
+                sql = 
+                    "INSERT INTO post_follows " +
+                    "(post_id, user_id, created_at, updated_at) " +
+                    "VALUES (?, ?, current_timestamp, current_timestamp) " + 
+                    "ON CONFLICT (post_id, user_id) DO NOTHING";
+
+                // save upvote
+                await trx.raw(sql, [post.id, user.id]);
+                following = true;
+            }
+
+            trx.commit();
+        } catch(e) {
+            trx.rollback();
+            console.error(e);
+
+            return response.status(500).send("follow failed");
+        }
+
+        return response.status(200).send(following);
     }
 
     async deleteQuestion({params, request, response, auth}) {
