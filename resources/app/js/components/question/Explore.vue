@@ -1,7 +1,7 @@
 <template>
     <v-layout row>
         <v-flex md3 xs12>
-            <v-layout fill-height>
+            <v-layout fill-height style="position: fixed">
                 <v-list class="grow grey lighten-4">
                     <v-list-tile
                         v-for="(item, link) in links"
@@ -16,10 +16,28 @@
             </v-layout>
         </v-flex>
         <v-flex md6 sm12>
-            <List :data="data" @refresh-list="loadQuestions()" />
+            <v-flex px-4 v-if="search.query || search.tags.length > 0">
+                <h3>{{ $t("question.labels.search_for", {query: search.query}) }}</h3>
+
+                <v-divider></v-divider>
+            </v-flex>
+
+            <v-content v-show="loading">
+                <v-container fluid fill-height class="grey lighten-4">
+                    <v-layout justify-center align-center>
+                        <v-progress-circular 
+                            :size="70" 
+                            :width="7" 
+                            indeterminate 
+                            color="primary"></v-progress-circular>
+                    </v-layout>
+                </v-container>
+            </v-content>
+
+            <List v-show="!loading" :data="data" @refresh-list="loadQuestions()" /></List>
         </v-flex>
         <v-flex md3 xs12>
-            <v-form @submit.prevent="">
+            <v-form style="position: fixed;">
                 <div class="headline">
                     <v-icon>search</v-icon> 
                     {{ $t('question.labels.search') }}

@@ -1,7 +1,7 @@
 <template>
     <v-layout row>
         <v-flex lg3 xs12>
-            <v-layout fill-height>
+            <v-layout fill-height style="position: fixed">
                 <v-list class="grow grey lighten-4">
                     <v-list-tile
                         v-for="(item, link) in links"
@@ -16,7 +16,19 @@
             </v-layout>
         </v-flex>
         <v-flex lg6 xs12>
-            <List :data="data" @refresh-list="loadQuestions(1)" />
+            <v-content v-show="loading">
+                <v-container fluid fill-height class="grey lighten-4">
+                    <v-layout justify-center align-center>
+                        <v-progress-circular 
+                            :size="70" 
+                            :width="7" 
+                            indeterminate 
+                            color="primary"></v-progress-circular>
+                    </v-layout>
+                </v-container>
+            </v-content>
+
+            <List v-show="!loading" :data="data" @refresh-list="loadQuestions(1)" />
         </v-flex>
         <v-flex lg3 xs12>
             <Topics></Topics>
@@ -50,7 +62,6 @@
         },
         mounted() {
             this.loadQuestions();
-            // this.loadTags();
         },
         methods: {
             loadQuestions(page) {

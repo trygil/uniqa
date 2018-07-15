@@ -70,7 +70,6 @@
                                     class="mx-0" 
                                     color="grey darken-2" 
                                     v-if="item.user_id != user.id"
-                                    :disabled="item.followed"
                                     @click="follow(item)">
                                     <v-icon>rss_feed</v-icon> 
                                     {{ item.followed ? 
@@ -169,6 +168,15 @@
             </v-card>
         </v-dialog>
 
+        <v-content v-show="data.length < 1">
+            <v-container fluid fill-height class="grey lighten-4">
+                <v-layout justify-center align-center>
+                    <div class="flex xs12 text-xs-center grey--text">
+                        <h3 class="display-1">Empty</h3>
+                    </div>
+                </v-layout>
+            </v-container>
+        </v-content>
     </div>
 </template>
 

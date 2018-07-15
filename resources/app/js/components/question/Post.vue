@@ -20,7 +20,7 @@
 
                 <v-layout row>
                     <!-- User-->
-                    <v-flex lg6 offset-xs6 text-xs-center pa-3>
+                    <v-flex lg6 offset-xs10 text-xs-center pa-3>
                         <v-btn 
                             v-if="!data.posts && posterid == user.id" 
                             title="choose as an answer"
