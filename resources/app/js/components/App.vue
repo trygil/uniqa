@@ -20,12 +20,7 @@
         </v-toolbar-items>
 
         <v-spacer></v-spacer>
-        <!-- <v-text-field
-            solo-inverted
-            flat
-            class="mr-3"
-            label="search.."
-            prepend-icon="search"></v-text-field> -->
+
         <v-toolbar-items>
             <v-menu
                 v-show="!user.username"
@@ -36,7 +31,28 @@
                 </v-btn>
                 <Login v-show="!user.username"></Login>
             </v-menu>
-            <v-menu offset-y close-on-click v-show="user.username">
+
+            <v-menu offset-y left min-width="250" close-on-click v-show="user.username">
+                <v-btn slot="activator" flat>
+                    <v-icon>notifications</v-icon>
+                </v-btn>
+
+                <v-list class="pa-2">
+                    <template v-for="(notif, id) in notifications">
+                        <template v-for="(usernames, context) in notif.context">
+                            <v-list-tile>
+                                <v-list-tile-content>
+                                    <v-list-tile-title>{{ notifActors(usernames) }}</v-list-tile-title>
+                                    <v-list-tile-sub-title v-html="notifInfo(context, notif)"></v-list-tile-sub-title>
+                                </v-list-tile-content>
+                            </v-list-tile>
+                            <v-divider></v-divider>
+                        </template>
+                    </template>
+                </v-list>
+            </v-menu>
+
+            <v-menu offset-y left close-on-click v-show="user.username">
                 <v-btn slot="activator" flat>
                     <v-avatar class="grey mr-2" size="32px">
                         <!-- <img src="../../images/user.png" alt="avatar"> -->
@@ -49,19 +65,16 @@
                 </v-btn>
 
                 <v-list dense>
-                    <v-divider></v-divider>
                     <div>
                         <a href="/profile" @click.prevent="profile" class="list__tile list__tile--link" style="position: relative;">
-                            <div class="list__tile__title text-md-center subheading"> profile </div>
+                            <div class="list__tile__title text-md-left subheading">
+                                <v-icon>person</v-icon> profile
+                            </div>
                         </a>
-                    </div>
-
-                    <div>
                         <a href="/logout" @click.prevent="logout" class="list__tile list__tile--link" style="position: relative;">
-                            <div class="list__tile__title text-md-center subheading"> logout </div>
-                            <!-- <span class="ripple__container">
-                                <span class="ripple__animation ripple__animation--visible" data-activated="1522379837402" style="width: 282px; height: 282px; transform: translate(-50%, -50%) translate(53px, 16px) scale3d(0.99, 0.99, 0.99);"></span>
-                            </span> -->
+                            <div class="list__tile__title text-md-left subheading">
+                                <v-icon>exit_to_app</v-icon> logout
+                            </div>
                         </a>
                     </div>
                 </v-list>
@@ -85,7 +98,9 @@ export default {
     name: "App",
     components: { Login },
     data: () => ({
-        drawer: null
+        drawer: null,
+        notify: null,
+        notifications: {},
     }),
     methods: {
         logout() {
@@ -95,6 +110,21 @@ export default {
 
         profile() {
             this.$router.push("/profile")
+        },
+        notifActors(actors) {
+            let params = {others: 0};
+
+            if (actors.length > 2)
+                params.others = actors.length - 2;
+
+            actors.map((actor, key) => {
+                params[key] = actor;
+            });
+
+            return this.$tc("notification.actors", actors.length, params);
+        },
+        notifInfo(context, notif) {
+            return this.$t("notification." + context, {title: notif.title});
         },
     },
     computed: {
@@ -116,6 +146,46 @@ export default {
 
             return Promise.reject(err);
         });
-    }
+    },
+    created() {
+        let vm = this;
+
+        vm.notify = this.$ws.connect().subscribe("notification:" + this.user.uid);
+
+        vm.notify.on('ready', () => {
+            vm.notify.emit('init', this.user.uid)
+        })
+
+        // all notifications arrive
+        vm.notify.on('all', (data) => {
+
+            console.log(data)
+
+            let notifications = {};
+            data.map((item) => {
+                if (!notifications[item.post_id])
+                    notifications[item.post_id] = {title: item.title, is_answer: item.is_answer, context: {}};
+
+                if (!notifications[item.post_id].context[item.context])
+                    notifications[item.post_id].context[item.context] = [];
+
+                notifications[item.post_id].context[item.context].push(item.username);
+            });
+
+            this.notifications = notifications;
+        })
+
+        // new notification arrive
+        vm.notify.on('new', (data) => {
+            console.log(data)
+        })
+
+        vm.notify.on('error', (error) => {
+            console.log(error)
+        })
+
+        vm.notify.on('close', () => {
+        })
+    },
 };
 </script>

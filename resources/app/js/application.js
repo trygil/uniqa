@@ -23,6 +23,7 @@ import router from './router'
 import i18n from "./lang"
 import jwt_decode from "jwt-decode";
 import moment from "moment";
+import ws from '@adonisjs/websocket-client';
 
 Vue.use(Vuetify)
 Vue.use(Row)
@@ -44,6 +45,7 @@ Vue.prototype.$ELEMENT = {locale: el_locale};
 Vue.http = Vue.prototype.$http = axios;
 Vue.prototype.$moment = moment;
 Vue.prototype.$confirm = MessageBox.confirm;
+Vue.prototype.$ws = ws(null, {});
 
 // check login token
 store.dispatch("checkLoginToken");

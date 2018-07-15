@@ -4,6 +4,7 @@ const Database = use('Database')
 const Post = use('App/Models/Post')
 const Report = use('App/Models/Report')
 const Tag = use('App/Models/Tag')
+const Notification = use('App/Models/Notification')
 const _ = use('lodash')
 
 let cte = `
@@ -119,7 +120,7 @@ class QuestionController {
         return res.rows;
     }
 
-    async recent({ request }) {
+    async recent({ request, auth }) {
         const params = request.all();
 
         let user = null;
@@ -131,6 +132,7 @@ class QuestionController {
             user = await auth.getUser();
             user_id = user.id;
         } catch (error) {
+            console.error(error)
             console.log("anonymous user");
         }
 
@@ -339,6 +341,18 @@ class QuestionController {
 
             await post.save(trx);
 
+            // create answer notification
+            let notif = new Notification();
+            notif.to = parent_post.user_id;
+            notif.data = {
+                context: "answer",
+                post_id: parent_post.id,
+                answer_id: post.id,
+                by: user.id,
+            };
+
+            await notif.save(trx);
+
             trx.commit();
         } catch(e) {
             trx.rollback();
@@ -384,6 +398,19 @@ class QuestionController {
             // update total upvotes
             post.upvote = total_upvotes;
             await post.save(trx);
+
+            // create upvote/downvote notification
+            if (val != 0) {
+                let notif = new Notification();
+                notif.to = post.user_id;
+                notif.data = {
+                    context: val == 1 ? "upvote" : "downvote",
+                    post_id: post.id,
+                    by: user.id,
+                };
+
+                await notif.save(trx);
+            }
 
             trx.commit();
         } catch(e) {
@@ -437,6 +464,17 @@ class QuestionController {
 
                 post.status = status;
                 await post.save(trx);
+
+                // create answer choosen notification
+                let notif = new Notification();
+                notif.to = choosen_post.user_id;
+                notif.data = {
+                    context: "choosen",
+                    post_id: choosen_post.id,
+                    by: user.id,
+                };
+
+                await notif.save(trx);
             }
 
             trx.commit();
@@ -477,6 +515,17 @@ class QuestionController {
 
             // save the report
             await report.save(trx);
+
+            // create post report notification
+            let notif = new Notification();
+            notif.to = post.user_id;
+            notif.data = {
+                context: "report",
+                post_id: post.id,
+                by: user.id,
+            };
+
+            await notif.save(trx);
 
             trx.commit();
         } catch(e) {
@@ -527,6 +576,17 @@ class QuestionController {
                 // save upvote
                 await trx.raw(sql, [post.id, user.id]);
                 following = true;
+
+                // create post follow notification
+                let notif = new Notification();
+                notif.to = post.user_id;
+                notif.data = {
+                    context: "follow",
+                    post_id: post.id,
+                    by: user.id,
+                };
+
+                await notif.save(trx);
             }
 
             trx.commit();
@@ -560,6 +620,10 @@ class QuestionController {
             await trx.table('posts')
                     .where("id", post.id)
                     .orWhere("parent_id", post.id).delete();
+
+            // delete notifications
+            sql = "DELETE FROM notifications WHERE data->>'post_id' = ?";
+            await trx.raw(sql, [post.id]);
 
             trx.commit();
         } catch(e) {
