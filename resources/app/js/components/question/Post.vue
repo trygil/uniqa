@@ -100,7 +100,6 @@
                 // send upvote
                 let response = await this.$http.post("/question/upvote/" + this.data.id, { val })
                     .then((res) => {
-                        console.log(res)
                         this.data.upvote = res.data;
                     })
                     .catch((err) => {

@@ -124,6 +124,9 @@ export default {
             return this.$tc("notification.actors", actors.length, params);
         },
         notifInfo(context, notif) {
+            if (notif.is_answer)
+                context += "_answer";
+
             return this.$t("notification." + context, {title: notif.title});
         },
     },
@@ -158,9 +161,6 @@ export default {
 
         // all notifications arrive
         vm.notify.on('all', (data) => {
-
-            console.log(data)
-
             let notifications = {};
             data.map((item) => {
                 if (!notifications[item.post_id])
@@ -177,11 +177,24 @@ export default {
 
         // new notification arrive
         vm.notify.on('new', (data) => {
-            console.log(data)
-        })
+            let notif = data[0];
+            let notifications = Object.assign({}, this.notifications); // copy object
+
+            // push new notification
+            if (!notifications[notif.post_id])
+                notifications[notif.post_id] = {title: notif.title, is_answer: notif.is_answer, context: {}};
+
+            if (!notifications[notif.post_id].context[notif.context])
+                notifications[notif.post_id].context[notif.context] = [];
+
+            notifications[notif.post_id].context[notif.context].push(notif.username);
+
+            // reassign notifications object
+            this.notifications = notifications;
+        });
 
         vm.notify.on('error', (error) => {
-            console.log(error)
+            console.error(error)
         })
 
         vm.notify.on('close', () => {
