@@ -21,16 +21,17 @@ class Notification extends Model {
                 JOIN users AS u ON u.id = (n.data->>'by')::integer 
                 JOIN posts AS p ON p.id = (n.data->>'post_id')::integer 
                 WHERE n."to" <> (n.data->>'by')::integer AND 
-                      n."to" = ?
-                ORDER BY n.data->>'post_id', n.created_at DESC, n.data->>'context'`;
+                      n.id = ?`;
 
-            let response = await Database.raw(sql, [notification.to]);
+            let response = await Database.raw(sql, [notification.id]);
 
             if (response.rows.length > 0) {
-                // broadcast websocket
-                Ws.getChannel('notification:*')
-                  .topic("notification:" + notification.to)
-                  .broadcast('new', response.rows);
+                let topic = Ws.getChannel('notification:*').topic("notification:" + notification.to);
+
+                // check if user online, if so
+                // broadcast new notification
+                if (topic)
+                  topic.broadcast('new', response.rows);
             }
         });
     }

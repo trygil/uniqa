@@ -341,6 +341,8 @@ class QuestionController {
 
             await post.save(trx);
 
+            trx.commit();
+
             // create answer notification
             let notif = new Notification();
             notif.to = parent_post.user_id;
@@ -351,9 +353,7 @@ class QuestionController {
                 by: user.id,
             };
 
-            await notif.save(trx);
-
-            trx.commit();
+            await notif.save();
         } catch(e) {
             trx.rollback();
             return response.status(500).send('save failed');
@@ -399,6 +399,8 @@ class QuestionController {
             post.upvote = total_upvotes;
             await post.save(trx);
 
+            trx.commit();
+
             // create upvote/downvote notification
             if (val != 0) {
                 let notif = new Notification();
@@ -409,10 +411,9 @@ class QuestionController {
                     by: user.id,
                 };
 
-                await notif.save(trx);
+                await notif.save();
             }
 
-            trx.commit();
         } catch(e) {
             trx.rollback();
             console.error(e)
@@ -448,9 +449,11 @@ class QuestionController {
             post.status = 0;
             await post.save(trx);
 
+            let choosen_post = null;
+
             if (url_params.id) {
                 // get choosen answer post
-                const choosen_post = await Post.find(url_params.id);
+                choosen_post = await Post.find(url_params.id);
 
                 if (!choosen_post)
                     throw new Error("choosen id not found");
@@ -464,7 +467,11 @@ class QuestionController {
 
                 post.status = status;
                 await post.save(trx);
+            }
 
+            trx.commit();
+
+            if (url_params.id && choosen_post) {
                 // create answer choosen notification
                 let notif = new Notification();
                 notif.to = choosen_post.user_id;
@@ -474,10 +481,8 @@ class QuestionController {
                     by: user.id,
                 };
 
-                await notif.save(trx);
+                await notif.save();
             }
-
-            trx.commit();
         } catch(e) {
             trx.rollback();
             console.error(e)
@@ -516,6 +521,8 @@ class QuestionController {
             // save the report
             await report.save(trx);
 
+            trx.commit();
+
             // create post report notification
             let notif = new Notification();
             notif.to = post.user_id;
@@ -525,9 +532,7 @@ class QuestionController {
                 by: user.id,
             };
 
-            await notif.save(trx);
-
-            trx.commit();
+            await notif.save();
         } catch(e) {
             trx.rollback();
             console.error(e);
@@ -576,20 +581,20 @@ class QuestionController {
                 // save upvote
                 await trx.raw(sql, [post.id, user.id]);
                 following = true;
-
-                // create post follow notification
-                let notif = new Notification();
-                notif.to = post.user_id;
-                notif.data = {
-                    context: "follow",
-                    post_id: post.id,
-                    by: user.id,
-                };
-
-                await notif.save(trx);
             }
 
             trx.commit();
+
+            // create post follow notification
+            let notif = new Notification();
+            notif.to = post.user_id;
+            notif.data = {
+                context: "follow",
+                post_id: post.id,
+                by: user.id,
+            };
+
+            await notif.save();
         } catch(e) {
             trx.rollback();
             console.error(e);
