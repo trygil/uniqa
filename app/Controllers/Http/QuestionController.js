@@ -132,8 +132,7 @@ class QuestionController {
             user = await auth.getUser();
             user_id = user.id;
         } catch (error) {
-            console.error(error)
-            console.log("anonymous user");
+            console.log("guest user");
         }
 
         // pagination params
@@ -162,7 +161,7 @@ class QuestionController {
         bindings.push(page * perpage);
         bindings.push(perpage * (page - 1));
 
-        let res = null
+        let res = {}
         try {
             res = await Database.raw(cte + sql, bindings);
         } catch(e) {
@@ -627,7 +626,7 @@ class QuestionController {
                     .orWhere("parent_id", post.id).delete();
 
             // delete notifications
-            sql = "DELETE FROM notifications WHERE data->>'post_id' = ?";
+            let sql = "DELETE FROM notifications WHERE data->>'post_id' = ?";
             await trx.raw(sql, [post.id]);
 
             trx.commit();

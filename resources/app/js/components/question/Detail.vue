@@ -11,7 +11,7 @@
 
                     <div v-for="item in data.posts">
                         <hr />
-                        <Post :posterid="data.user_id" :data="item" @choosen="changeStatus" />
+                        <Post :posterid="data.user_id" :data="item" @choosen="changeStatus" @refresh-question="loadQuestions" />
                     </div>
                 </template>
 

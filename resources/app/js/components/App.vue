@@ -1,6 +1,6 @@
 <template>
 <v-app id="inspire">
-    <v-toolbar color="teal" dark app fixed clipped-left>
+    <v-toolbar color="teal lighten-2" app fixed clipped-left>
         <!-- <v-toolbar-side-icon @click.native="drawer = !drawer"></v-toolbar-side-icon> -->
         <router-link to="/" class="title ml-3 mr-5">
             <v-avatar tile :size="50">
@@ -10,11 +10,11 @@
         </router-link>
 
         <v-toolbar-items>
-            <v-btn to="/questions" flat>
+            <v-btn dark to="/questions" flat>
                 <v-icon>language</v-icon> {{ $t("question.menu.explore") }}
             </v-btn>
 
-            <v-btn to="/ask" flat v-show="user.username">
+            <v-btn dark to="/ask" flat v-show="user.username">
                 <v-icon>question_answer</v-icon> {{ $t("question.menu.ask_question") }}
             </v-btn>
         </v-toolbar-items>
@@ -22,19 +22,25 @@
         <v-spacer></v-spacer>
 
         <v-toolbar-items>
-            <v-menu
+            <v-menu 
                 v-show="!user.username"
                 offset-y
+                left
+                attach
+                min-width="400"
                 :close-on-content-click="false">
-                <v-btn slot="activator" :ripple="false" flat>
+                <v-btn slot="activator" :ripple="false" flat dark>
                     Login
                 </v-btn>
-                <Login v-show="!user.username"></Login>
+                <Login @after-login="afterLogin" v-show="!user.username"></Login>
             </v-menu>
 
-            <v-menu offset-y left min-width="250" close-on-click v-show="user.username">
-                <v-btn slot="activator" flat>
-                    <v-icon>notifications</v-icon>
+            <v-menu light attach offset-y left min-width="250" close-on-click v-show="user.username">
+                <v-btn slot="activator" flat dark @click="notification.unread = 0">
+                    <v-badge right overlap v-model="notification.unread > 0">
+                        <span slot="badge">{{ notification.unread }}</span>
+                        <v-icon>notifications</v-icon>
+                    </v-badge>
                 </v-btn>
 
                 <v-list class="pa-2">
@@ -52,11 +58,9 @@
                 </v-list>
             </v-menu>
 
-            <v-menu offset-y left close-on-click v-show="user.username">
-                <v-btn slot="activator" flat>
-                    <v-avatar class="grey mr-2" size="32px">
-                        <!-- <img src="../../images/user.png" alt="avatar"> -->
-                    </v-avatar>
+            <v-menu light attach offset-y left close-on-click v-show="user.username">
+                <v-btn slot="activator" flat dark>
+                    <v-avatar class="light-blue mr-2">{{ (user.username || "").substr(0, 1) }}</v-avatar>
                     <span class="subheading"
                           style="text-transform: none;">
                         {{ user.username }}
@@ -100,14 +104,19 @@ export default {
     data: () => ({
         drawer: null,
         notify: null,
+        notification: {unread: 0},
         notifications: {},
     }),
     methods: {
         logout() {
+            this.notifications = {};
+            this.notification.unread = 0;
             this.$store.dispatch("attemptLogout");
             this.$router.push("/")
         },
-
+        afterLogin() {
+            this.notify.emit('init', this.user.id)
+        },
         profile() {
             this.$router.push("/profile")
         },
@@ -156,7 +165,8 @@ export default {
         vm.notify = this.$ws.connect().subscribe("notification:" + this.user.uid);
 
         vm.notify.on('ready', () => {
-            vm.notify.emit('init', this.user.uid)
+            if (this.user.uid)
+                vm.notify.emit('init', this.user.uid)
         })
 
         // all notifications arrive
@@ -170,6 +180,11 @@ export default {
                     notifications[item.post_id].context[item.context] = [];
 
                 notifications[item.post_id].context[item.context].push(item.username);
+            });
+
+            let vm = this;
+            Object.keys(notifications).map((id) => {
+                vm.notification.unread += Object.keys(notifications[id].context).length;
             });
 
             this.notifications = notifications;
@@ -189,6 +204,8 @@ export default {
 
             notifications[notif.post_id].context[notif.context].push(notif.username);
 
+            this.notification.unread += 1;
+
             // reassign notifications object
             this.notifications = notifications;
         });
@@ -198,6 +215,7 @@ export default {
         })
 
         vm.notify.on('close', () => {
+            console.log('connection closed')
         })
     },
 };

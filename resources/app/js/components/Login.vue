@@ -19,7 +19,7 @@
             </v-card-title>
             <v-card-actions>
                 <div>
-                    <v-btn color="primary" @click="login">Login</v-btn>
+                    <v-btn color="primary" size="large" @click="login">Login</v-btn>
                 </div>
                 <div>
                     <a href="#">Don't have an account? Sign up</a>
@@ -45,6 +45,7 @@ export default {
                 .then(() => {
                     // reset form
                     this.form = {};
+                    this.$emit('after-login');
                 })
                 .catch((e) => {
                     this.$message.error(this.$t("auth.messages.login-failed"))
