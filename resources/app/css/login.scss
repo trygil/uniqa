@@ -22,20 +22,25 @@ body {
     position: relative;
 }
 
+.logo img {
+    width: 100%;
+}
+
 .right, .left {
-    width: 50%;
     margin: 0 auto;
     padding-top: 40px;
-    height: 450px;
+    min-height: 450px;
     overflow: hidden;
 }
 
 .right {
+    width: 60%;
     float: right;
-    background-color: #039BE5;
+    background-color: #c7dee8;
 }
 
 .left {
+    width: 40%;
     float: left;
 }
 
@@ -46,7 +51,7 @@ body {
     font-size: 10px;
 }
 
-.register {
+.register, .el-form-item__label {
     display: block;
-    color: #ffffff;
+    color: #424242;
 }

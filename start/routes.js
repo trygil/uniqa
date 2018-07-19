@@ -13,13 +13,18 @@
 |
 */
 
+const Env = use('Env')
 const Route = use('Route')
 const Person = use('App/Models/Admin/Person')
+const User = use('App/Models/User')
+const domain = /http(s?):\/\/([\w\.]+).*/.exec(Env.get('APP_URL'))[2];
 
 Route.group(() => {
     Route.get('/login', 'AppController.getLogin')
     Route.post('/login', 'AppController.postLogin')
     Route.get('/accept/:token', 'PersonController.acceptInvitation')
+    Route.post('/register', 'PersonController.register')
+    Route.get('/api/check-username', 'PersonController.checkUsername');
 
     // auth
     Route.get('/checkauth', 'AppController.refresh')
@@ -40,7 +45,7 @@ Route.group(() => {
 
     // SPA route
     Route.any('*', ({ view, auth }) => view.render('uniqamente'));
-}).domain('uni.qa')
+}).domain(domain)
 
 Route.group(() => {
     Route.get('/login', 'AdminController.getLogin')
@@ -70,4 +75,4 @@ Route.group(() => {
             user: auth.authenticator('admin').user,
         })
     ).middleware(['admin_auth'])
-}).domain('admin.uni.qa')
+}).domain('admin.' + domain)

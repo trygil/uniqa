@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Uniqa Registration</title>
+        <link rel="shortcut icon" href="uniqamente.png" type="image/png">
+    </head>
+
+    <body>
+        <div id="login">
+            <div class="container">
+                <div class="right">
+                    <div class="register">
+                        <el-row>
+                            <el-col :lg="{span: 18, offset: 3}" :md="{span: 16, offset: 4}">
+                                <el-form
+                                    method="post" 
+                                    action="/register" 
+                                    label-position="left" 
+                                    label-width="100px" 
+                                    ref="register_form"
+                                    status-icon
+                                    @submit.native=""
+                                    :model="form"
+                                    :rules="rules">
+                                    {{ csrfField() }}
+                                    <h2>
+                                        Hello, 
+                                        {{ person.first_name }}
+                                        {{ person.last_name }}
+                                    </h2>
+
+                                    <h3>
+                                        you registered using
+                                        <i>{{ person.email }}</i>
+                                    </h3>
+
+                                    <input hidden name="token" value="{{ token }}">
+
+                                    <el-form-item label="Username" prop="username">
+                                        <el-input 
+                                            type="text" 
+                                            name="username" 
+                                            v-model="form.username" 
+                                            placeholder="choose your username"
+                                            ></el-input>
+                                    </el-form-item>
+
+                                    <el-form-item label="Password" prop="password">
+                                        <el-input 
+                                            type="password" 
+                                            name="password" 
+                                            v-model="form.password" 
+                                            placeholder="create a password"></el-input>
+                                    </el-form-item>
+
+                                    <el-form-item label="Confirm Password" prop="confirm_password">
+                                        <el-input 
+                                            type="password" 
+                                            name="confirm_password" 
+                                            v-model="form.confirm_password" 
+                                            placeholder="re-enter your password"></el-input>
+                                    </el-form-item>
+
+                                    <el-form-item>
+                                        <el-button 
+                                            native-type="submit" 
+                                            type="danger" 
+                                            size="medium" 
+                                            style="float: right">
+                                            Register
+                                        </el-button>
+                                    </el-form-item>
+                                </el-form>
+                            </el-col>
+                        </el-row>
+                    </div>
+                </div>
+
+                <div class="left">
+                    <div class="logo">
+                        <img src="/uniqamente.png">
+                        <h2>UNIQA</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Uniqamente 2018
+        </div>
+        {{ css('assets/app_login_style.css') }}
+        {{ script('assets/app_login.js') }}
+    </body>
+</html>

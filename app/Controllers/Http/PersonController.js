@@ -69,82 +69,110 @@ class PersonController {
 
         const reqParam = request.all()
         const trx = await Database.beginTransaction()
-        const person = await Person.find(reqParam.id)
-
-        // delete old invitation(s)
-        await Invitation.query().where('person_id', reqParam.id).delete(trx)
-
-        // make invitation
-        const invitation = new Invitation()
-
-        invitation.fill({
-            token: Encryption.encrypt(reqParam.id),
-            person_id: reqParam.id,
-        })
-
-        await invitation.save(trx)
-
-        // Send Invitation Link
-        const param = {
-            link: Env.get('APP_URL') + '/accept/' + encodeURIComponent(invitation.token),
-            person: person,
-        }
-
-        await Mail.send('email.invitation', param, (message) => {
-            message
-                .to(person.email)
-                .from('invitation@uni.qa')
-                .subject('Invitation Link')
-        })
-
-        trx.commit()
-
-        return 'Registered successfully'
-    }
-
-    async acceptInvitation({response, session, params}) {
-        const Hash = use('Hash')
-
+        
         try {
-            const trx = await Database.beginTransaction()
+            const person = await Person.find(reqParam.id)
 
-            const invitation = await Invitation.findByOrFail('token', decodeURIComponent(params.token))
-            invitation.status = 1
+            // delete old invitation(s)
+            await Invitation.query().where('person_id', reqParam.id).delete(trx)
+
+            // make invitation
+            const invitation = new Invitation()
+
+            invitation.fill({
+                token: Encryption.encrypt(reqParam.id),
+                person_id: reqParam.id,
+            })
+
             await invitation.save(trx)
 
-            const person = await Person.findByOrFail('id', invitation.person_id)
-            const user = new User()
-            const password = Math.random().toString(36).substring(2)
+            // Send Invitation Link
+            const param = {
+                link: Env.get('APP_URL') + '/accept/' + encodeURIComponent(invitation.token),
+                person: person,
+            }
 
-            user.fill({
-                username: Math.random().toString(36).substring(2),
-                email: person.email,
-                password: password,
-            })
-
-            // Send Password Info
-            await Mail.send('email.password', { password }, (message) => {
+            await Mail.send('email.invitation', param, (message) => {
                 message
                     .to(person.email)
-                    .from('info@uni.qa')
-                    .subject('Password Information')
+                    .from(Env.get('MAIL_ADDRESS'))
+                    .subject('Invitation Link')
             })
 
-            person.status = 1;
-            await person.save(trx)
-            await user.save(trx)
-
             trx.commit()
-            session.flash({ success: ['Akun anda telah sukses terdaftar. Silahkan login'] })
+        } catch (e) {
+            console.error(e);
+            return response.status(500).send('failed to send invitation');
+        }
 
-            return response.redirect('/login')
+        return response.send('invitation sent');
+    }
+
+    async acceptInvitation({response, session, params, view}) {
+        const Env = use('Env')
+
+        try {
+            const invitation = await Invitation.findByOrFail('token', decodeURIComponent(params.token))
+            const person = await Person.findByOrFail('id', invitation.person_id)
+            const user = await User.findBy('email', person.email);
+
+            if (user) {
+                session.flash({ error: ['Email ini telah terdaftar sebagai user, silahkan login'] })
+                return response.redirect(Env.get('APP_URL'))
+            }
+
+            let token = encodeURIComponent(invitation.token);
+
+            return view.render('app/register', {invitation, person, token})
         }
         catch (e) {
+            console.error(e)
+
             // invalid token
             session.flash({ error: ['Gagal mendaftarkan akun, link undangan mungkin telah kadaluarsa'] })
         }
 
-        return response.redirect('/')
+        return response.redirect(Env.get('APP_URL'))
+    }
+
+    async register({request, response}) {
+        const form = request.all();
+
+        const trx = await Database.beginTransaction()
+
+        try {
+            const invitation = await Invitation.findByOrFail('token', decodeURIComponent(form.token))
+            const person = await Person.findByOrFail('id', invitation.person_id)
+
+            let user = new User();
+            user.username = form.username;
+            user.password = form.password;
+            user.email = person.email;
+
+            await user.save(trx);
+
+            trx.commit();
+
+            return response.status(200).redirect("/");
+        }
+        catch (e) {
+            trx.rollback();
+            console.error(e);
+        }
+
+        return response.redirect("back");
+    }
+
+    async checkUsername({request, response}) {
+        try {
+            const username = request.all().username;
+            await User.findByOrFail("username", username);
+
+            return response.status(401).send("username already registered");
+        } catch(e) {
+            console.error(e);
+            return response.status(200).send("username not registered");
+        }
     }
 
     async cancel({request}) {
