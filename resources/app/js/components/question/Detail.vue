@@ -16,13 +16,11 @@
                 </template>
 
                 <template>
-                    <v-flex lg10 offset-lg1 v-show="user.id">
+                    <v-flex lg12 v-show="user.id">
                         <v-form @submit.prevent="answer">
-                            <v-text-field
-                                v-model="form.post"
-                                autofocus
-                                :label="$t('question.labels.answer')"
-                                textarea></v-text-field>
+                            <v-divider></v-divider>
+                            <label class="body-2">{{ $t('question.labels.answer') }}</label>
+                            <wysiwyg v-model="form.post"></wysiwyg>
                             <v-btn 
                                 type="submit" 
                                 size="large" 

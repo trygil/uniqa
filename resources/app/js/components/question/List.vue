@@ -61,6 +61,7 @@
                         <v-card-title>
                             <v-flex offset-xs2>
                                 <v-btn round small outline 
+                                    v-if="user.id"
                                     class="mx-0"
                                     color="primary"
                                     @click="openAnswer(item)">
@@ -69,7 +70,7 @@
                                 <v-btn round small outline 
                                     class="mx-0" 
                                     color="grey darken-2" 
-                                    v-if="item.user_id != user.id"
+                                    v-if="user.id && item.user_id != user.id"
                                     @click="follow(item)">
                                     <v-icon>rss_feed</v-icon> 
                                     {{ item.followed ? 
@@ -135,6 +136,7 @@
 
         <v-dialog
             v-model="answer_dialog"
+            v-if="user.id"
             fullscreen
             hide-overlay
             transition="dialog-bottom-transition"
@@ -157,12 +159,9 @@
                     <v-flex xs8 offset-xs2 v-if="form.post">
                         <span class="title">{{ form.post.title }}</span>
                         <p class="headline">{{ form.post.post }}</p>
-                        <v-text-field
-                            v-model="form.answer"
-                            rows="2"
-                            :label="$t('question.labels.answer')"
-                            textarea
-                            autofocus></v-text-field>
+                        <v-divider></v-divider>
+                        <label class="body-2">{{ $t('question.labels.answer') }}</label>
+                        <wysiwyg v-model="form.answer"></wysiwyg>
                     </v-flex>
                 </v-card-text>
             </v-card>

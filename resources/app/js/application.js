@@ -24,6 +24,13 @@ import i18n from "./lang"
 import jwt_decode from "jwt-decode";
 import moment from "moment";
 import ws from '@adonisjs/websocket-client';
+import wysiwyg from "vue-wysiwyg";
+
+// your config here
+let wysiwyg_config = {
+    hideModules: { "image": true },
+    maxHeight: "450px",
+};
 
 Vue.use(Vuetify)
 Vue.use(Row)
@@ -36,6 +43,7 @@ Vue.use(Alert)
 Vue.use(Dialog)
 Vue.use(Radio)
 Vue.use(RadioGroup)
+Vue.use(wysiwyg, wysiwyg_config)
 
 moment.locale('id');
 
